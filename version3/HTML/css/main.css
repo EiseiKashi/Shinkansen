@@ -1,0 +1,13 @@
+.container {
+	overflow:hidden;
+	width:2000px;
+	height:2000px;
+}
+
+img {
+	display:inline;
+	position:absolute;
+	float:left;
+	width:90px;
+	height:90px;
+}

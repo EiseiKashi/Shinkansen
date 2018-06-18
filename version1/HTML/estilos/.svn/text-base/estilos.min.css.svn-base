@@ -1,0 +1,10 @@
+body{color:#666666;background-color:#0A0A0A;background-position:center;font-family:Georgia,Times,serif;line-height:1.4em;margin:0px;}
+article{width:940px;margin:20px auto 20px auto;border:1px solid #CC9933;background-color:#9A9A9A;background-position:center;}
+.menu,.menu ul,.menu li,.menu a{margin:0;padding:0;border:none;outline:none;}
+.menu{height:40px;width:940px;background:#CC3333;alignment-adjust:central;}
+.menu li{position:relative;list-style:none;float:left;display:block;height:40px;}
+.menu ul{display:none;}
+.menu li a{display:block;padding:0 14px;margin:6px 0;line-height:28px;text-decoration:none;border-left:1px solid #CC6633;border-right:1px solid #CC9933;font-family:Helvetica,Arial,sans-serif;font-weight:bold;font-size:13px;color:#f3f3f3;text-shadow:1px 1px 1px rgba(0,0,0,.6);}
+.menu li:hover a{color:#CCCC33;}
+figure{padding-left:200px;}
+img{border:5px solid #333333;}

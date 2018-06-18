@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Manejo de eventos</title>
+    
+    <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]--> 
+    
+    <script>
+    
+        // Escucha del click
+        function escuchaDeClick(event) {
+                alert("Link Cliqueado!");
+        }
+            
+        // Asignamos el escucha una vez que
+        // se haya cargado la página.
+        window.onload = function() {
+        
+            // Obtenemos la referencia de etiqueta
+            // que contiene los links.
+            var etiquetaNav = document.getElementById("navegacionPrincipal");
+            
+            // En vez asignar un escucha a cada uno
+            // de los links. Lo asignamos a la etiqueta
+            // contenedora de los mismos.
+            // Cuando cualquiera de las etiquetas reciba
+            // el click, será escuchado por la etiqueta <nav>
+            etiquetaNav.addEventListener("click", escuchaDeClick, true);
+        }
+        
+    </script>
+</head>
+<body>
+
+    <nav id="navegacionPrincipal">
+        <a href="#">Fuji go ko</a> |
+        <a href="#">Matsumoto</a> |
+        <a href="#">Miyajima</a> |
+        <a href="#">Tokio</a> |
+        <a href="#">Kioto</a>
+    </nav>
+
+</body>
+</html>

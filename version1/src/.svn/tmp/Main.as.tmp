@@ -1,0 +1,131 @@
+package 
+{
+	import admotion.net.URLNavigator;
+	import flash.display.MovieClip;
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	import flash.net.navigateToURL;
+	import flash.net.URLRequest;
+	
+	/**
+	 * ...
+	 * @author 
+	 */
+	public class Main extends Sprite 
+	{
+		private var _camera:Camera;
+		public function Main():void 
+		{
+			if (stage) init();
+			else addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+		
+		private function init(e:Event = null):void {
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDownStage);
+			removeEventListener(Event.ADDED_TO_STAGE, init);
+			
+			_camera           = new Camera();
+			_camera.offsetX   = stage.stageWidth  / 2;
+			_camera.offsetY   = stage.stageHeight / 2;
+			
+			var map:MovieClip = _camera.map;
+			var fracc:Number = 100;
+			var container:MovieClip = new MovieClip();
+			var length:uint         = 8;
+			var topX:Number         = -fracc*7;
+			var indexX:int          = 7;
+			var index:int           = 0;
+			while(indexX > -1) {
+				var indexY:int          = 7;
+				while (indexY > -1) {
+					var mc:NihonAsset = new NihonAsset();
+					
+					mc.y = indexY * fracc;
+					mc.x = topX;
+					mc.indexT.text = String(indexX) + "." + String(indexY);
+					container.addChild(mc);
+					
+					var mc3D:Sprite3D = new Sprite3D(mc.indexT.text);
+						mc3D.x    = mc.x;
+						mc3D.z    = mc.y;
+						mc3D.view = mc;
+					
+					_camera.addItem(mc3D);
+					index++
+					indexY --;
+				}
+				topX += fracc;
+				indexX--;
+			}
+			addChild(container);
+			
+			
+				map.scaleX   = 0.2;
+				map.scaleY   = 0.2;
+				map.x        = stage.stageWidth  - map.width  - 20;
+				map.y        = stage.stageHeight - map.height - 20;
+				map.rotation = 180;
+			
+			var invert:MovieClip = _camera.inverseMap;
+				invert.scaleX    = 0.3;
+				invert.scaleY    = 0.3;
+				invert.y         = invert.height / 2 + 20;
+				invert.x         = 20;
+				invert.rotation  = 180;
+				
+			this.addChild(container);
+			this.addChild(map);
+			this.addChild(invert);
+			
+			
+			this.addChild(_camera.debugger);
+		}
+		
+		private function onKeyDownStage(event:KeyboardEvent):void {
+			trace("> " +  event.keyCode);
+			switch(event.keyCode) {
+				//////////////////////////////////////
+				case 37:// left
+					_camera.cameraX += 1;
+					break;
+				case 39:// right
+					_camera.cameraX -= 1;
+					break;
+				//////////////////////////////////////
+				case 38:// up
+					break;
+				case 40:// down
+					break;
+				/////////////////////////////////////
+				// Rotation
+				case 82 : // R
+					_camera.radian += 0.1;
+					break;
+				case 84 : // T
+					_camera.radian += 0.1;
+					break;
+				/////////////////////////////////////
+				// Lens
+				case 70 : // F
+					_camera.focalLength += 10;
+					//setPan();
+					break;
+				case 71 : // G
+					_camera.focalLength -= 10;
+					break;
+				/////////////////////////////////////
+				// Depth
+				case 68: // D
+					_camera.cameraZ ++;
+					break;
+				case 83: // S
+					_camera.cameraZ --;
+					break;
+				/////////////////////////////////////
+			}
+		}
+	}
+	
+}
