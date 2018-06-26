@@ -1,4 +1,4 @@
-(function J3 (){
+function Shinkansen (){
 	var _self = this;
 	var PI2/*Number*/     = Math.PI * 2;
 	
@@ -37,7 +37,7 @@
 	this.setViewPortX = function (value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_viewPortX = value;
-			render();
+			_self.render();
 		}
 		return _viewPortX;
 	}
@@ -46,7 +46,7 @@
 	this.setViewPortY = function (value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_viewPortY = value;
-			render();
+			_self.render();
 		}
 		return _viewPortY;
 	}
@@ -67,7 +67,7 @@
 	
 	this.addItem = function(item/*:Sprite3D*/)/*:void*/ {
 		_itemsList.push(item);
-		render();
+		_self.render();
 	}
 	
 	this.removeItem = function (item/*:Sprite3D*/)/*:void*/ {
@@ -77,7 +77,7 @@
 			return;
 		}
 		_itemsList.splice(index, 1);
-		render();
+		_self.render();
 	}
 	
 	//----------------------------------------------
@@ -86,7 +86,7 @@
 	this.setOffsetY = function (value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_offsetY = value;
-			render();
+			_self.render();
 		}
 		return _offsetY;
 	}
@@ -95,7 +95,7 @@
 	this.setOffsetX = function (value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_offsetX = value;
-			render();
+			_self.render();
 		}
 		return _offsetX;
 	}
@@ -104,7 +104,7 @@
 	this.setCameraX = function(value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_cameraX = value;
-			render();
+			_self.render();
 		}
 		return _cameraX;
 	}
@@ -113,7 +113,7 @@
 	this.setCameraY = function(value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_cameraY = value;
-			render();
+			_self.render();
 		}
 		return _cameraY;
 	}
@@ -122,7 +122,7 @@
 	this.setCameraZ = function(value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_cameraZ = value
-			render();
+			_self.render();
 		}
 		return _cameraZ;
 	}
@@ -130,9 +130,9 @@
 	this.getAngle = function()/*Number*/ {return _angle;}
 	this.setAngle = function(value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
-			setRadian(getRadianFromAngle(value));
+			_self.setRadian(getRadianFromAngle(value));
 			_angle = value; 
-			render();
+			_self.render();
 		}
 		return _angle;
 	}
@@ -142,7 +142,7 @@
 		if(!isNaN(value)){
 			_radian = value;
 			_angle  = getAngleFromRadian(_radian);
-			render();
+			_self.render();
 		}
 		return _radian;
 	}
@@ -151,18 +151,13 @@
 	this.setFocalLength = function(value/*Number*/)/*:void*/ {
 		if(!isNaN(value)){
 			_focalLength = value;
-			render();
+			_self.render();
 		}
 		return _focalLength;
 	}
 	
-	//----------------------------------------------
-	// Helpers
-	//----------------------------------------------
-	
-	//----------------------------------------------
-	// Render!!!
-	function render()/*:void*/ {
+	// _self.render!!!
+	this.render = function()/*:void*/ {
 		var length/*:uint*/ = _itemsList.length;
 		if(0 == length){
 			// Early return
@@ -257,21 +252,24 @@
 			index++
 		}
 	}
+	//----------------------------------------------
+	// Helpers
+	//----------------------------------------------
 	
-	function getHipotenuse(dx/*Number*/, dy/*Number*/)/*Number*/ {
+	var getHipotenuse  = function(dx/*Number*/, dy/*Number*/)/*Number*/ {
 		var hypotenuse/*Number*/ =  Math.sqrt(dx * dx + dy * dy);
 		return hypotenuse;
 	}
 	
-	function getRadianFromAngle (degree/*Number*/)/*Number*/{
+	var getRadianFromAngle  = function(degree/*Number*/)/*Number*/{
 		return degree * (PI2/360);
 	}
 	
-	function getAngleFromRadian(radian/*Number*/)/*Number*/ {
+	var getAngleFromRadian  = function(radian/*Number*/)/*Number*/ {
 		return radian * (360/PI2);
 	}
 	
-	function updateProperties()/*:void*/ {
+	var updateProperties  = function()/*:void*/ {
 		var halfViewPort/*Number*/ = _viewPortX / 2;
 		var visionLength/*Number*/ = getHipotenuse(halfViewPort, _focalLength);
 		
@@ -294,7 +292,7 @@
 		_interceptorY  = _cameraY1 - _slope * _cameraX1;
 	}
 	
-	function getRotatedPoint(x/*Number*/, y/*Number*/, radian/*Number*/, originX/*Number=0*/, originY/*Number=0*/)/*:Point*/ {
+	var getRotatedPoint  = function(x/*Number*/, y/*Number*/, radian/*Number*/, originX/*Number=0*/, originY/*Number=0*/)/*:Point*/ {
 		originX = getDefaultValue(originX, 0);
 		originY = getDefaultValue(originY, 0);
 		
@@ -304,12 +302,12 @@
 		return point;
 	}
 	
-	function checkIsInRange(x/*Number*/, y/*Number*/)/*:Boolean*/ {
+	var checkIsInRange  = function(x/*Number*/, y/*Number*/)/*:Boolean*/ {
 		var radian/*Number*/ = getVectorsRadian(_pointLength.x, _pointLength.y, x, y);
 		return _visionRadian > radian;
 	}
 	
-	function getVectorsRadian(point1X/*Number*/, point1Y/*Number*/,
+	var getVectorsRadian  = function(point1X/*Number*/, point1Y/*Number*/,
 									  point2X/*Number*/, point2Y/*Number*/ )/*Number*/ {
 		point1X -= _cameraX;
 		point1Y -= _cameraZ;
@@ -334,22 +332,18 @@
 		return radian;
 	}
 	
-	function getPointDistance(itemX/*Number*/, itemY/*Number*/, 
+	var getPointDistance  = function(itemX/*Number*/, itemY/*Number*/, 
 									  x1/*Number*/, y1/*Number*/, x2/*Number*/, y2/*Number*/)/*Number*/ {
 		var denominator/*Number*/ = Math.abs((y2 - y1) * itemX - (x2 - x1) * itemY + x2 * y1 - y2 * x1);
 		var divisor/*Number*/     = Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 -x1, 2));
 		return denominator / divisor;
-		/*
 		
-		d = 	|A·Mx + B·My + C|
-					√A2 + B2
-					
-		https://www.youtube.com/watch?v=bfZ57ESvFok
-		
-		*/
+		// d = 	|A·Mx + B·My + C|
+		//			√A2 + B2		
+		//https://www.youtube.com/watch?v=bfZ57ESvFok
 	}
 	
-	function getPointIntersection(itemX/*Number*/, itemY/*Number*/)/*:Point*/ {
+	var getPointIntersection  = function(itemX/*Number*/, itemY/*Number*/)/*:Point*/ {
 		var m2/*Number*/ = -(1 / _slope);
 		var b2/*Number*/  = itemY - m2 * itemX;
 		var x2/*Number*/  = (b2-_interceptorY)/(_slope-m2);
@@ -357,19 +351,16 @@
 		return new Point(x2, y2);
 	}
 	
-	function Point(x/*:Number*/, y/*:Number*/) {
+	var Point  = function(x/*:Number*/, y/*:Number*/) {
 		this.x = x;
 		this.y = y;
 	}
 	
-	function getDefaultValue(value, defaultValue)/*:void*/ {
+	var getDefaultValue = function(value, defaultValue)/*:void*/ {
 		var finalValue = typeof(value) === "undefined" ? defaultValue : value;
 		return finalValue;
 	}
-	
-	window.Camera = this;
-
-})()
+}
 
 
 window.Sprite3D = function (view/*:MovieClip=null*/, 
