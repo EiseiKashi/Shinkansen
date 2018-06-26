@@ -9,32 +9,27 @@
 		_camera.setOffsetX   (800  / 2);
 		_camera.setOffsetY   (600 / 2);
 		
-		var node/*:DIV*/;
-		var item/*:Sprite3D*/;
+		var node;
+		var item;
 		
-		var _size                   = 120;
-		
-		var fracc/*:Number*/        = 120;
-		
-		var totalColumns/*:Number*/ = 5;
-		var totalRows/*:Number*/    = 2;
-		
-		var yPostion/*:Number*/     = 0;
-		
-		var rowIndex/*:Number*/     = 0;
-		var columnIndex/*:Number*/  = 0;
-		
-		var indexX/*:int*/          = 1;
-		var index/*:int*/           = 0;
+		var _size			= 120;
+		var fracc			= 120;
+		var totalColumns	= 5;
+		var totalRows    	= 2;
+		var yPostion		= 0;
+		var rowIndex		= 0;
+		var columnIndex		= 0;
+		var indexX			= 1;
+		var index			= 0;
 		var x;
 		var y;
 		while (rowIndex < totalRows) {
 			columnIndex = 0;
 			while(columnIndex < totalColumns) {
-				node = document.getElementById("imagen" + index);
-				x = columnIndex*_size;
-				y = rowIndex*_size;
-				item = new window.Sprite3D(node, x, 0, y);
+				node	= document.getElementById("imagen" + index);
+				x		= columnIndex*_size;
+				y		= rowIndex*_size;
+				item	= new window.Sprite3D(node, x, 0, y);
 				_camera.addItem(item);
 				index++
 				columnIndex ++;
@@ -57,10 +52,7 @@
 		}, 30);
 	}
 	
-	function onRender(view/*:View*/, index/*:uint*/,
-					  x/*:Number*/, y/*:Number*/, z/*:Number*/,
-					  scale/*:Number*/,
-					  isFirstItem/*:Boolean*/, isLastItem/*:Boolean*/)/*:void*/ {
+	function onRender(view, index,x, y, z, scale, isFirstItem, isLastItem) {
 		if(scale == 0){
 			view.style.display = "none";
 			return;
