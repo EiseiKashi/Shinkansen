@@ -1,56 +1,51 @@
-(function Main (){
-	
-	var _camera;
-	
-	window.onload = function(){
-		_camera = new Shinkansen();
-		_camera.setViewPortX (800);
-		_camera.setViewPortY (600);
-		_camera.setOffsetX   (800  / 2);
-		_camera.setOffsetY   (600 / 2);
+var shinkansen;
+	shinkansen = new Shinkansen();
+	shinkansen.setViewPortX (800);
+	shinkansen.setViewPortY (600);
+	shinkansen.setOffsetX   (800 / 2);
+	shinkansen.setOffsetY   (600 / 2);
 		
-		var node;
-		var item;
+var node;
+var item;
 		
-		var _size			= 120;
-		var fracc			= 120;
-		var totalColumns	= 5;
-		var totalRows    	= 2;
-		var yPostion		= 0;
-		var rowIndex		= 0;
-		var columnIndex		= 0;
-		var indexX			= 1;
-		var index			= 0;
-		var x;
-		var y;
+var _size			= 120;
+var fracc			= 120;
+var totalColumns	= 5;
+var totalRows    	= 2;
+var yPostion		= 0;
+var rowIndex		= 0;
+var columnIndex		= 0;
+var indexX			= 1;
+var index			= 0;
+var x;
+var y;
 		while (rowIndex < totalRows) {
 			columnIndex = 0;
 			while(columnIndex < totalColumns) {
 				node	= document.getElementById("imagen" + index);
 				x		= columnIndex*_size;
 				y		= rowIndex*_size;
-				item	= new window.Sprite3D(node, x, 0, y);
-				_camera.addItem(item);
+				item	= shinkansen.getClip3D(node, x, 0, y);
+				shinkansen.addItem(item);
 				index++
 				columnIndex ++;
 			}
 			rowIndex++;
 		}
 		
-		_camera.setCameraX(570);
-		_camera.setCameraY(0);
+		shinkansen.setCameraX(570);
+		shinkansen.setCameraY(0);
 		var camera = 570;
-		_camera.setCameraZ(15);
+		shinkansen.setCameraZ(15);
 		
-		_camera.addCallback(onRender);
+		shinkansen.addCallback(onRender);
 		
-		_camera.setAngle(90);
+		shinkansen.setAngle(90);
 		
 		setInterval(function(){
-			_camera.setCameraX(camera);
+			shinkansen.setCameraX(camera);
 			camera -= 1;
 		}, 30);
-	}
 	
 	function onRender(view, index,x, y, z, scale, isFirstItem, isLastItem) {
 		if(scale == 0){
@@ -65,4 +60,3 @@
 		view.style.height  = (scale*99) + "px";
 		view.style.zIndex  = index;
 	}
-})()
