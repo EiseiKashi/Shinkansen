@@ -1,12 +1,38 @@
 /*
 	Version 0.0.1
-	# Mark for render
+	# Mark to render
 */
-var version = 8;
+var version = 9;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
 	'use strict';
+
+	window.check = true;
+	var lastTime = 0;
+	var vendors  = ['ms', 'moz', 'webkit', 'o'];
+
+	for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+		window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+		window.cancelAnimationFrame  = window[vendors[x]+'CancelAnimationFrame'] 
+										|| window[vendors[x]+'CancelRequestAnimationFrame'];
+	}
+
+	if (!window.requestAnimationFrame){
+		window.requestAnimationFrame = function(callback, element) {
+			var currTime   = Date.now();
+			var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+			var id         = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
+			lastTime       = currTime + timeToCall;
+			return id;
+		};
+	}
+
+	if (!window.cancelAnimationFrame){
+		window.cancelAnimationFrame = function(id) {
+			clearTimeout(id);
+		}
+	}
 
 	// ::: EMITTER ::: //
 	var Event = function(type, data){
@@ -293,10 +319,8 @@ function Shinkansen (){
 				throw new Error("Can not add a null item");
 			}
 			_itemsList.push(item);
-
-			addEventListener(Shinkansen.ADD, item);
-
 			_self.render();
+			emitEvent(Shinkansen.ADD, item);
 		}
 		
 		this.remove = function (item) {
@@ -306,8 +330,8 @@ function Shinkansen (){
 				return;
 			}
 			_itemsList.splice(index, 1);
-			addEventListener(Shinkansen.REMOVE, item);
 			_self.render();
+			emitEvent(Shinkansen.REMOVE, item);
 		}
 		
 		//----------------------------------------------
@@ -392,7 +416,12 @@ function Shinkansen (){
 			return _focalLength;
 		}
 		
-		this.render = function() {
+		this.render = function(notForce) {
+			if(notForce && _willEmit.length == 0){
+				//Early return
+				return;
+			}
+
 			var length = _itemsList.length;
 			if(0 == length){
 				// Early return
@@ -482,6 +511,14 @@ function Shinkansen (){
 				}
 				index++
 			}
+
+			var length = _willEmit.length;
+			var event;
+			for(var index=0; index < length; index++){
+				event = _willEmit[index];
+				emitEvent(event.type, event.data);
+			}
+			_willEmit.length = 0;
 		}
 
 		// Add listener
@@ -496,7 +533,11 @@ function Shinkansen (){
 		
 		var emitEvent = function(type, data){
             _emitter.emit(type, data);
-        }
+		}
+		
+		var addEventToEmit = function(type, data){
+			_willEmit.push({type:type, data:data});
+		}
 
 		//----------------------------------------------
 		// Helpers
@@ -603,9 +644,12 @@ function Shinkansen (){
 			return finalValue;
 		}
 
-		var addEventToEmit = function(type, data){
-			_willEmit.push({type:type, data:data});
+		var update = function (){
+			_self.render(true);
+			requestAnimationFrame(update);
 		}
+
+		update();
 	}
 
 	Shinkansen.ADD			= "add";
