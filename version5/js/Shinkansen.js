@@ -1,13 +1,127 @@
 /*
 	Version 0.0.1
-	# Facade of addItem
+	# Mark for render
 */
-var version = 5;
+var version = 8;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
 	'use strict';
 
+	// ::: EMITTER ::: //
+	var Event = function(type, data){
+		this.type = type;
+		this.data = data;
+	}
+
+    var Emitter = function(target){
+        'use strict';
+        var _typeCounter   = 0;
+        var _hasMouse      = false;
+                           
+        var CONTEXT        = 0;
+        var LISTENER       = 1;
+        var _target        = target;
+        
+        var _listenerTypes = {};
+        var _listenerList;
+        
+        var listener;
+        
+        this.addEventListener = function(type, listener, context){
+            if(null == type || type == "" || typeof listener !== FUNCTION ){
+                return;
+            }
+            _listenerList = _listenerTypes[type];
+            if(null == _listenerList){
+                _listenerList = _listenerTypes[type] = [];
+            }
+            
+            var length = _listenerList.length;
+            for(var index=0; index < length; index++){
+                if(listener[LISTENER] == listener && 
+                   listener[CONTEXT]  == context){
+                    return;
+                }
+            }
+            _listenerTypes[type].push([context, listener]);
+            switch(type){
+                case CLICK : 
+                case MOUSE_OVER :
+                case MOUSE_OUT :
+                case MOUSE_DOWN : 
+                case MOUSE_UP :
+                case MOUSE_LEAVE : 
+                case MOUSE_LEAVE : 
+                case DRAG :
+                case DROP :
+                _typeCounter++;
+                break;
+            }
+            
+            _hasMouse = true;
+            return _hasMouse;
+        }
+        
+        this.removeEventListener = function(type, listener, context){
+            if(null == type || type == "" || typeof listener !== FUNCTION ){
+                return;
+            }
+            
+            _listenerList = _listenerTypes[type];
+            if(null == _listenerList){
+                return
+            }
+            
+            var length = _listenerList.length;
+            for(var index=0; index < length; index++){
+                listener = _listenerList[index];
+                if(listener[LISTENER] == listener && 
+                   listener[CONTEXT]  == context){
+                    _listenerTypes[type].splice(index, 1);
+                    switch(type){
+                        case CLICK : 
+                        case MOUSE_OVER :
+                        case MOUSE_OUT :
+                        case MOUSE_DOWN : 
+                        case MOUSE_UP :
+                        case MOUSE_LEAVE : 
+                        case MOUSE_LEAVE : 
+                        case DRAG :
+                        case DROP :
+                        _typeCounter--;
+                        break;
+                    }
+                    _typeCounter = Math.min(_typeCounter, 0);
+                    _hasMouse = _typeCounter > 0;
+                    return true;
+                }
+            }
+        }
+        
+        this.emit = function(type, data){
+            if(null == type || type == ""){
+                return;
+            }
+            _listenerList = _listenerTypes[type];
+            if(null == _listenerList){
+                return
+            }
+            data        = null == data || typeof data != OBJECT ? {} : data;
+            data.type   = type;
+            data.target = _target;
+            var length  = _listenerList.length;
+            for(var index=0; index < length; index++){
+                listener = _listenerList[index];
+            listener[LISTENER].apply(listener[CONTEXT], [data]);
+            }
+        }
+        
+        this.hasMouse = function(){
+            return _hasMouse;
+        }
+	}
+	
 	var Clip3D = function (view, x, y, z) {
 		'use strict';
 
@@ -100,8 +214,9 @@ function Shinkansen (){
 
 	var Shinkansen = function() {
 		'use strict';
-
 		var _self			= this;
+		var _emitter		= new Emitter(this);
+		var _willEmit		= [];
 		var PI2				= Math.PI * 2;
 		
 		var _itemsList		= new Array();
@@ -172,9 +287,15 @@ function Shinkansen (){
 			_self.add(item);
 			return item;
 		}
-		
+
 		this.add = function(item) {
+			if(null == item){
+				throw new Error("Can not add a null item");
+			}
 			_itemsList.push(item);
+
+			addEventListener(Shinkansen.ADD, item);
+
 			_self.render();
 		}
 		
@@ -185,6 +306,7 @@ function Shinkansen (){
 				return;
 			}
 			_itemsList.splice(index, 1);
+			addEventListener(Shinkansen.REMOVE, item);
 			_self.render();
 		}
 		
@@ -212,6 +334,7 @@ function Shinkansen (){
 		this.setCameraX = function(value) {
 			if(!isNaN(value)){
 				_cameraX = value;
+				addEventToEmit(Shinkansen.CAMERA_X, _cameraX);
 				_self.render();
 			}
 			return _cameraX;
@@ -221,6 +344,7 @@ function Shinkansen (){
 		this.setCameraY = function(value) {
 			if(!isNaN(value)){
 				_cameraY = value;
+				addEventToEmit(Shinkansen.CAMERA_Y, _cameraY);
 				_self.render();
 			}
 			return _cameraY;
@@ -229,7 +353,8 @@ function Shinkansen (){
 		this.getCameraZ = function() {return _cameraZ;}
 		this.setCameraZ = function(value) {
 			if(!isNaN(value)){
-				_cameraZ = value
+				_cameraZ = value;
+				addEventToEmit(Shinkansen.CAMERA_Z, _cameraZ);
 				_self.render();
 			}
 			return _cameraZ;
@@ -250,6 +375,8 @@ function Shinkansen (){
 			if(!isNaN(value)){
 				_radian = value;
 				_angle  = getAngleFromRadian(_radian);
+				addEventToEmit(Shinkansen.ANGLE, _angle);
+				addEventToEmit(Shinkansen.RADIAN, _radian);
 				_self.render();
 			}
 			return _radian;
@@ -259,6 +386,7 @@ function Shinkansen (){
 		this.setFocalLength = function(value) {
 			if(!isNaN(value)){
 				_focalLength = value;
+				addEventToEmit(Shinkansen.FOCAL_LENGTH, _focalLength);
 				_self.render();
 			}
 			return _focalLength;
@@ -355,6 +483,20 @@ function Shinkansen (){
 				index++
 			}
 		}
+
+		// Add listener
+        this.addEventListener = function (type, listener, context){
+            _emitter.addEventListener(type, listener, context);
+        }
+        
+        // Remove Listener
+        this.removeEventListener = function (type, listener, context){
+            _emitter.removeEventListener(type, listener, context);
+		}
+		
+		var emitEvent = function(type, data){
+            _emitter.emit(type, data);
+        }
 
 		//----------------------------------------------
 		// Helpers
@@ -460,7 +602,21 @@ function Shinkansen (){
 			var finalValue = typeof(value) === "undefined" ? defaultValue : value;
 			return finalValue;
 		}
+
+		var addEventToEmit = function(type, data){
+			_willEmit.push({type:type, data:data});
+		}
 	}
 
+	Shinkansen.ADD			= "add";
+	Shinkansen.REMOVE		= "remove";
+	Shinkansen.CAMERA_X		= "cameraX";
+	Shinkansen.CAMERA_Y		= "cameraY";
+	Shinkansen.CAMERA_Z		= "cameraZ";
+	Shinkansen.ANGLE		= "angle";
+	Shinkansen.RADIAN		= "radian";
+	Shinkansen.FOCAL_LENGTH	= "focalLength";
+	Shinkansen.RENDER		= "render";
+	
 	return new Shinkansen();
 }
