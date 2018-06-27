@@ -1,38 +1,12 @@
 /*
 	Version 0.0.1
-	# Lazy render
+	# Remove tick
 */
 var version = 10;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
 	'use strict';
-
-	window.check = true;
-	var lastTime = 0;
-	var vendors  = ['ms', 'moz', 'webkit', 'o'];
-
-	for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-		window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-		window.cancelAnimationFrame  = window[vendors[x]+'CancelAnimationFrame'] 
-										|| window[vendors[x]+'CancelRequestAnimationFrame'];
-	}
-
-	if (!window.requestAnimationFrame){
-		window.requestAnimationFrame = function(callback, element) {
-			var currTime   = Date.now();
-			var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-			var id         = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
-			lastTime       = currTime + timeToCall;
-			return id;
-		};
-	}
-
-	if (!window.cancelAnimationFrame){
-		window.cancelAnimationFrame = function(id) {
-			clearTimeout(id);
-		}
-	}
 
 	// ::: EMITTER ::: //
 	var Event = function(type, data){
@@ -242,7 +216,6 @@ function Shinkansen (){
 		'use strict';
 		var _self			= this;
 		var _emitter		= new Emitter(this);
-		var _willEmit		= [];
 		var PI2				= Math.PI * 2;
 		
 		var _itemsList		= new Array();
@@ -280,7 +253,7 @@ function Shinkansen (){
 		this.setViewPortX = function (value) {
 			if(!isNaN(value)){
 				_viewPortX = value;
-				_self.render();
+				_self.doRender();
 			}
 			return _viewPortX;
 		}
@@ -289,7 +262,7 @@ function Shinkansen (){
 		this.setViewPortY = function (value) {
 			if(!isNaN(value)){
 				_viewPortY = value;
-				_self.render();
+				_self.doRender();
 			}
 			return _viewPortY;
 		}
@@ -319,7 +292,7 @@ function Shinkansen (){
 				throw new Error("Can not add a null item");
 			}
 			_itemsList.push(item);
-			_self.render();
+			_self.doRender();
 			emitEvent(Shinkansen.ADD, item);
 		}
 		
@@ -330,7 +303,7 @@ function Shinkansen (){
 				return;
 			}
 			_itemsList.splice(index, 1);
-			_self.render();
+			_self.doRender();
 			emitEvent(Shinkansen.REMOVE, item);
 		}
 		
@@ -340,7 +313,7 @@ function Shinkansen (){
 		this.setOffsetY = function (value) {
 			if(!isNaN(value)){
 				_offsetY = value;
-				_self.render();
+				_self.doRender();
 			}
 			return _offsetY;
 		}
@@ -349,7 +322,7 @@ function Shinkansen (){
 		this.setOffsetX = function (value) {
 			if(!isNaN(value)){
 				_offsetX = value;
-				_self.render();
+				_self.doRender();
 			}
 			return _offsetX;
 		}
@@ -358,7 +331,8 @@ function Shinkansen (){
 		this.setCameraX = function(value) {
 			if(!isNaN(value)){
 				_cameraX = value;
-				addEventToEmit(Shinkansen.CAMERA_X, _cameraX);
+				_self.doRender();
+				emitEvent(Shinkansen.CAMERA_X, _cameraX);
 			}
 			return _cameraX;
 		}
@@ -367,7 +341,8 @@ function Shinkansen (){
 		this.setCameraY = function(value) {
 			if(!isNaN(value)){
 				_cameraY = value;
-				addEventToEmit(Shinkansen.CAMERA_Y, _cameraY);
+				_self.doRender();
+				emitEvent(Shinkansen.CAMERA_Y, _cameraY);
 			}
 			return _cameraY;
 		}
@@ -376,7 +351,8 @@ function Shinkansen (){
 		this.setCameraZ = function(value) {
 			if(!isNaN(value)){
 				_cameraZ = value;
-				addEventToEmit(Shinkansen.CAMERA_Z, _cameraZ);
+				_self.doRender();
+				emitEvent(Shinkansen.CAMERA_Z, _cameraZ);
 			}
 			return _cameraZ;
 		}
@@ -394,8 +370,9 @@ function Shinkansen (){
 			if(!isNaN(value)){
 				_radian = value;
 				_angle  = getAngleFromRadian(_radian);
-				addEventToEmit(Shinkansen.ANGLE, _angle);
-				addEventToEmit(Shinkansen.RADIAN, _radian);
+				_self.doRender();
+				emitEvent(Shinkansen.ANGLE, _angle);
+				emitEvent(Shinkansen.RADIAN, _radian);
 			}
 			return _radian;
 		}
@@ -404,17 +381,13 @@ function Shinkansen (){
 		this.setFocalLength = function(value) {
 			if(!isNaN(value)){
 				_focalLength = value;
-				addEventToEmit(Shinkansen.FOCAL_LENGTH, _focalLength);
+				_self.doRender();
+				emitEvent(Shinkansen.FOCAL_LENGTH, _focalLength);
 			}
 			return _focalLength;
 		}
-		
-		this.render = function(notForce) {
-			if(notForce && _willEmit.length == 0){
-				//Early return
-				return;
-			}
 
+		this.doRender = function(notForce) {
 			var length = _itemsList.length;
 			if(0 == length){
 				// Early return
@@ -505,13 +478,7 @@ function Shinkansen (){
 				index++
 			}
 
-			var length = _willEmit.length;
-			var event;
-			for(var index=0; index < length; index++){
-				event = _willEmit[index];
-				emitEvent(event.type, event.data);
-			}
-			_willEmit.length = 0;
+			emitEvent(Shinkansen.RENDER);
 		}
 
 		// Add listener
@@ -526,10 +493,6 @@ function Shinkansen (){
 		
 		var emitEvent = function(type, data){
             _emitter.emit(type, data);
-		}
-		
-		var addEventToEmit = function(type, data){
-			_willEmit.push({type:type, data:data});
 		}
 
 		//----------------------------------------------
@@ -636,13 +599,6 @@ function Shinkansen (){
 			var finalValue = typeof(value) === "undefined" ? defaultValue : value;
 			return finalValue;
 		}
-
-		var update = function (){
-			_self.render(true);
-			requestAnimationFrame(update);
-		}
-
-		update();
 	}
 
 	Shinkansen.ADD			= "add";
