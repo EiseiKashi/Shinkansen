@@ -1,12 +1,16 @@
 /*
 	Version 0.0.1
-	# Clip 3d builder
+	# use strict
 */
-var version = 1;
+var version = 2;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
+	'use strict';
+
 	var Clip3D = function (view, x, y, z) {
+		'use strict';
+
 		var _view		= null != view ? view : null;
 		var _x			= isNaN(x) ? 0 : x;
 		var _y			= isNaN(y) ? 0 : y;
@@ -95,6 +99,8 @@ function Shinkansen (){
 	}
 
 	var Shinkansen = function() {
+		'use strict';
+
 		var _self			= this;
 		var PI2				= Math.PI * 2;
 		
