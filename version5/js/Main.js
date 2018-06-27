@@ -25,8 +25,7 @@ var y;
 				node	= document.getElementById("imagen" + index);
 				x		= columnIndex*_size;
 				y		= rowIndex*_size;
-				item	= shinkansen.getClip3D(node, x, 0, y);
-				shinkansen.addItem(item);
+				item	= shinkansen.addNew(node, x, 0, y);
 				index++
 				columnIndex ++;
 			}

@@ -1,8 +1,8 @@
 /*
 	Version 0.0.1
-	# use strict
+	# Facade of addItem
 */
-var version = 2;
+var version = 5;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
@@ -167,12 +167,18 @@ function Shinkansen (){
 			_callbacksList.splice(index, 1);
 		}
 		
-		this.addItem = function(item) {
+		this.addNew = function(view, x, y, z){
+			var item = new Clip3D(view, x, y, z);
+			_self.add(item);
+			return item;
+		}
+		
+		this.add = function(item) {
 			_itemsList.push(item);
 			_self.render();
 		}
 		
-		this.removeItem = function (item) {
+		this.remove = function (item) {
 			_itemsList.push(item);
 			var index = _itemsList.indexOf(item);
 			if (index < 0) {
@@ -350,12 +356,6 @@ function Shinkansen (){
 			}
 		}
 
-		//----------------------------------------------
-		// Builders
-		//----------------------------------------------
-		this.getClip3D = function(view, x, y, z){
-			return new Clip3D(view, x, y, z);
-		}
 		//----------------------------------------------
 		// Helpers
 		//----------------------------------------------
