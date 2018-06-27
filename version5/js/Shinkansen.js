@@ -1,8 +1,8 @@
 /*
 	Version 0.0.1
-	# Mark to render
+	# Lazy render
 */
-var version = 9;
+var version = 10;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
@@ -359,7 +359,6 @@ function Shinkansen (){
 			if(!isNaN(value)){
 				_cameraX = value;
 				addEventToEmit(Shinkansen.CAMERA_X, _cameraX);
-				_self.render();
 			}
 			return _cameraX;
 		}
@@ -369,7 +368,6 @@ function Shinkansen (){
 			if(!isNaN(value)){
 				_cameraY = value;
 				addEventToEmit(Shinkansen.CAMERA_Y, _cameraY);
-				_self.render();
 			}
 			return _cameraY;
 		}
@@ -379,7 +377,6 @@ function Shinkansen (){
 			if(!isNaN(value)){
 				_cameraZ = value;
 				addEventToEmit(Shinkansen.CAMERA_Z, _cameraZ);
-				_self.render();
 			}
 			return _cameraZ;
 		}
@@ -388,8 +385,6 @@ function Shinkansen (){
 		this.setAngle = function(value) {
 			if(!isNaN(value)){
 				_self.setRadian(getRadianFromAngle(value));
-				_angle = value; 
-				_self.render();
 			}
 			return _angle;
 		}
@@ -401,7 +396,6 @@ function Shinkansen (){
 				_angle  = getAngleFromRadian(_radian);
 				addEventToEmit(Shinkansen.ANGLE, _angle);
 				addEventToEmit(Shinkansen.RADIAN, _radian);
-				_self.render();
 			}
 			return _radian;
 		}
@@ -411,7 +405,6 @@ function Shinkansen (){
 			if(!isNaN(value)){
 				_focalLength = value;
 				addEventToEmit(Shinkansen.FOCAL_LENGTH, _focalLength);
-				_self.render();
 			}
 			return _focalLength;
 		}
