@@ -227,6 +227,112 @@ function Shinkansen (){
 		this.setVisible = function(value) {
 			_visible = value;
 		}
+
+		this.addEventListener = function(type, listener, context){
+            _emitter.addEventListener(type, listener, context);
+        }
+        
+        this.removeEventListener = function(type, listener, context){
+			_emitter.removeEventListener(type, listener, context);
+		}
+		
+		var emit =function(type, data){
+			_emitter.emit(type, data);
+		}
+	}
+
+	var Point3D = function (view, x, y, z) {
+		'use strict';
+		var _id			= clipIdCounter;
+		clipIdCounter++;
+
+		var _emitter    = new Emitter(this);
+
+		var _view		= null != view ? view : null;
+		var _x			= isNumber(x) ? x : 0;
+		var _y			= isNumber(y) ? y : 0;
+		var _z			= isNumber(z) ? z : 0;
+		
+		var _renderedX	= 0;
+		var _renderedY	= 0;
+		var _renderedZ	= 0;
+		
+		var _visible	= true;
+		
+		var _scale		= 0;
+		
+		this.getId = function() {
+			return _view != null ? _view.name : null;
+		}
+		
+		this.getView = function() {return _view;}
+		this.setView = function(value) {
+			if (null != value) {
+				_view = value;
+			}
+			return _view;
+		}
+		
+		this.getX = function() {return _x;}
+		this.setX = function(value) {
+			if (isNumber(value)) {
+				_x = value;
+			}
+			return _x;
+		}
+		
+		this.getY = function() {return _y;}
+		this.setY = function(value) {
+			if (isNumber(value)) {
+				_y = value;
+			}
+			return _y;
+		}
+		
+		this.getZ = function() {return _z;}
+		this.setZ = function(value) {
+			if (isNumber(value)) {
+				_z = value;
+			}
+			return _z;
+		}
+		
+		this.getRenderedX = function() {return _renderedX;}
+		this.setRenderedX = function(value) {
+			if (isNumber(value)) {
+				_renderedX = value;
+			}
+			return _renderedX;
+		}
+		
+		this.getRenderedY = function() {return _renderedY;}
+		this.setRenderedY = function(value) {
+			if (isNumber(value)) {
+				_renderedY = value;
+			}
+			return _renderedY;
+		}
+		
+		this.getRenderedZ = function() {return _renderedZ;}
+		this.setRenderedZ = function(value) {
+			if (isNumber(value)) {
+				_renderedZ = value;
+			}
+			return _renderedZ;
+		}
+		
+		this.getScale = function() {return _scale;}
+		this.setScale = function(value) {
+			if(isNumber(value)){
+				_scale = value;
+			}
+			return _scale;
+		}
+		
+		this.getVisible = function() {return _visible;}
+		this.setVisible = function(value) {
+			_visible = value;
+		}
 	}
 
 	var Shinkansen = function() {
