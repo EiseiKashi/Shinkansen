@@ -9,8 +9,8 @@ window.isNumber = function(number){
     if(!isNull){
         isString = number.length != undefined;
     }
-    var isDefenetlyNotANumber = isNull|| isNotN  ||  isString;
-    if( isDefenetlyNotANumber){
+    var isNotAnumber = isNull || isNotN  ||  isString;
+    if( isNotAnumber){
         return false;
     }
     return true;
