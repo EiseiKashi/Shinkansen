@@ -1,7 +1,21 @@
 /*
 	Version 0.0.1
-	# Remove tick
+	# Is a Number
 */
+window.isNumber = function(number){
+    var isNull   = null == number;
+    var isNotN   = isNaN(number);
+    var isString;
+    if(!isNull){
+        isString = number.length != undefined;
+    }
+    var isDefenetlyNotANumber = isNull|| isNotN  ||  isString;
+    if( isDefenetlyNotANumber){
+        return false;
+    }
+    return true;
+}
+
 var version = 10;
 document.title = version + " Shinkansen";
 
@@ -122,13 +136,16 @@ function Shinkansen (){
         }
 	}
 	
+	var clipIdCounter = 0;
 	var Clip3D = function (view, x, y, z) {
 		'use strict';
+		var _id			= clipIdCounter;
+		clipIdCounter++;
 
 		var _view		= null != view ? view : null;
-		var _x			= isNaN(x) ? 0 : x;
-		var _y			= isNaN(y) ? 0 : y;
-		var _z			= isNaN(z) ? 0 : z;
+		var _x			= isNumber(x) ? x : 0;
+		var _y			= isNumber(y) ? y : 0;
+		var _z			= isNumber(z) ? z : 0;
 		
 		var _renderedX	= 0;
 		var _renderedY	= 0;
@@ -152,7 +169,7 @@ function Shinkansen (){
 		
 		this.getX = function() {return _x;}
 		this.setX = function(value) {
-			if (!isNaN(value)) {
+			if (isNumber(value)) {
 				_x = value;
 			}
 			return _x;
@@ -160,7 +177,7 @@ function Shinkansen (){
 		
 		this.getY = function() {return _y;}
 		this.setY = function(value) {
-			if (!isNaN(value)) {
+			if (isNumber(value)) {
 				_y = value;
 			}
 			return _y;
@@ -168,7 +185,7 @@ function Shinkansen (){
 		
 		this.getZ = function() {return _z;}
 		this.setZ = function(value) {
-			if (!isNaN(value)) {
+			if (isNumber(value)) {
 				_z = value;
 			}
 			return _z;
@@ -176,7 +193,7 @@ function Shinkansen (){
 		
 		this.getRenderedX = function() {return _renderedX;}
 		this.setRenderedX = function(value) {
-			if (!isNaN(value)) {
+			if (isNumber(value)) {
 				_renderedX = value;
 			}
 			return _renderedX;
@@ -184,7 +201,7 @@ function Shinkansen (){
 		
 		this.getRenderedY = function() {return _renderedY;}
 		this.setRenderedY = function(value) {
-			if (!isNaN(value)) {
+			if (isNumber(value)) {
 				_renderedY = value;
 			}
 			return _renderedY;
@@ -192,7 +209,7 @@ function Shinkansen (){
 		
 		this.getRenderedZ = function() {return _renderedZ;}
 		this.setRenderedZ = function(value) {
-			if (!isNaN(value)) {
+			if (isNumber(value)) {
 				_renderedZ = value;
 			}
 			return _renderedZ;
@@ -200,7 +217,7 @@ function Shinkansen (){
 		
 		this.getScale = function() {return _scale;}
 		this.setScale = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_scale = value;
 			}
 			return _scale;
@@ -251,7 +268,7 @@ function Shinkansen (){
 		
 		this.getViewPortX = function () {return _viewPortX;}
 		this.setViewPortX = function (value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_viewPortX = value;
 				_self.doRender();
 			}
@@ -260,7 +277,7 @@ function Shinkansen (){
 		
 		this.getViewPortY = function () {return _viewPortY;}
 		this.setViewPortY = function (value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_viewPortY = value;
 				_self.doRender();
 			}
@@ -311,7 +328,7 @@ function Shinkansen (){
 		// Desplazamiento de camera
 		this.getOffsetY = function () {return _offsetY;}
 		this.setOffsetY = function (value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_offsetY = value;
 				_self.doRender();
 			}
@@ -320,7 +337,7 @@ function Shinkansen (){
 		
 		this.getOffsetX = function () {return _offsetX;}
 		this.setOffsetX = function (value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_offsetX = value;
 				_self.doRender();
 			}
@@ -329,7 +346,7 @@ function Shinkansen (){
 		
 		this.getCameraX = function(){return _cameraX;}
 		this.setCameraX = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_cameraX = value;
 				_self.doRender();
 				emitEvent(Shinkansen.CAMERA_X, _cameraX);
@@ -339,7 +356,7 @@ function Shinkansen (){
 		
 		this.getCameraY = function(){return _cameraY;}
 		this.setCameraY = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_cameraY = value;
 				_self.doRender();
 				emitEvent(Shinkansen.CAMERA_Y, _cameraY);
@@ -349,7 +366,7 @@ function Shinkansen (){
 		
 		this.getCameraZ = function() {return _cameraZ;}
 		this.setCameraZ = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_cameraZ = value;
 				_self.doRender();
 				emitEvent(Shinkansen.CAMERA_Z, _cameraZ);
@@ -359,7 +376,7 @@ function Shinkansen (){
 		
 		this.getAngle = function() {return _angle;}
 		this.setAngle = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_self.setRadian(getRadianFromAngle(value));
 			}
 			return _angle;
@@ -367,7 +384,7 @@ function Shinkansen (){
 		
 		this.getRadian = function() {return _radian;}
 		this.setRadian = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_radian = value;
 				_angle  = getAngleFromRadian(_radian);
 				_self.doRender();
@@ -379,7 +396,7 @@ function Shinkansen (){
 		
 		this.getFocalLength = function() {return _focalLength;}
 		this.setFocalLength = function(value) {
-			if(!isNaN(value)){
+			if(isNumber(value)){
 				_focalLength = value;
 				_self.doRender();
 				emitEvent(Shinkansen.FOCAL_LENGTH, _focalLength);
