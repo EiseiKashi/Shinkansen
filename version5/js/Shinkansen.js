@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Is a Number
+	# 3d Object
 */
 window.isNumber = function(number){
     var isNull   = null == number;
@@ -237,7 +237,7 @@ function Shinkansen (){
 		}
 		
 		var emit =function(type, data){
-			_emitter.emit(type, data);
+			_emitter.emit(type, data); 
 		}
 	}
 
