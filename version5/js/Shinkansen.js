@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D properties update - 1
+	# Clip 3D properties update - renderX
 */
 
 var version = 10;
@@ -162,9 +162,9 @@ function Shinkansen (){
 		var _y			= isNumber(y) ? y : 0;
 		var _z			= isNumber(z) ? z : 0;
 		
-		var _renderedX	= 0;
-		var _renderedY	= 0;
-		var _renderedZ	= 0;
+		this.renderX	= 0;
+		var _renderY	= 0;
+		var _renderZ	= 0;
 		
 		var _visible	= true;
 		
@@ -206,28 +206,20 @@ function Shinkansen (){
 			return _z;
 		}
 		
-		this.getRenderedX = function() {return _renderedX;}
-		this.setRenderedX = function(value) {
-			if (isNumber(value)) {
-				_renderedX = value;
-			}
-			return _renderedX;
-		}
-		
-		this.getRenderedY = function() {return _renderedY;}
+		this.getRenderedY = function() {return _renderY;}
 		this.setRenderedY = function(value) {
 			if (isNumber(value)) {
-				_renderedY = value;
+				_renderY = value;
 			}
-			return _renderedY;
+			return _renderY;
 		}
 		
-		this.getRenderedZ = function() {return _renderedZ;}
+		this.getRenderedZ = function() {return _renderZ;}
 		this.setRenderedZ = function(value) {
 			if (isNumber(value)) {
-				_renderedZ = value;
+				_renderZ = value;
 			}
-			return _renderedZ;
+			return _renderZ;
 		}
 		
 		this.getScale = function() {return _scale;}
@@ -253,100 +245,6 @@ function Shinkansen (){
 		
 		var emit =function(type, data){
 			_emitter.emit(type, data); 
-		}
-	}
-
-	var Point3D = function (view, x, y, z) {
-		'use strict';
-		var _id			= clipIdCounter;
-		clipIdCounter++;
-
-		var _emitter    = new Emitter(this);
-
-		var _view		= null != view ? view : null;
-		var _x			= isNumber(x) ? x : 0;
-		var _y			= isNumber(y) ? y : 0;
-		var _z			= isNumber(z) ? z : 0;
-		
-		var _renderedX	= 0;
-		var _renderedY	= 0;
-		var _renderedZ	= 0;
-		
-		var _visible	= true;
-		
-		var _scale		= 0;
-		
-		this.getId = function() {
-			return _view != null ? _view.name : null;
-		}
-		
-		this.getView = function() {return _view;}
-		this.setView = function(value) {
-			if (null != value) {
-				_view = value;
-			}
-			return _view;
-		}
-		
-		this.getX = function() {return _x;}
-		this.setX = function(value) {
-			if (isNumber(value)) {
-				_x = value;
-			}
-			return _x;
-		}
-		
-		this.getY = function() {return _y;}
-		this.setY = function(value) {
-			if (isNumber(value)) {
-				_y = value;
-			}
-			return _y;
-		}
-		
-		this.getZ = function() {return _z;}
-		this.setZ = function(value) {
-			if (isNumber(value)) {
-				_z = value;
-			}
-			return _z;
-		}
-		
-		this.getRenderedX = function() {return _renderedX;}
-		this.setRenderedX = function(value) {
-			if (isNumber(value)) {
-				_renderedX = value;
-			}
-			return _renderedX;
-		}
-		
-		this.getRenderedY = function() {return _renderedY;}
-		this.setRenderedY = function(value) {
-			if (isNumber(value)) {
-				_renderedY = value;
-			}
-			return _renderedY;
-		}
-		
-		this.getRenderedZ = function() {return _renderedZ;}
-		this.setRenderedZ = function(value) {
-			if (isNumber(value)) {
-				_renderedZ = value;
-			}
-			return _renderedZ;
-		}
-		
-		this.getScale = function() {return _scale;}
-		this.setScale = function(value) {
-			if(isNumber(value)){
-				_scale = value;
-			}
-			return _scale;
-		}
-		
-		this.getVisible = function() {return _visible;}
-		this.setVisible = function(value) {
-			_visible = value;
 		}
 	}
 
@@ -514,12 +412,12 @@ function Shinkansen (){
 				scaleFactor		= _focalLength / (z);
 				item.visible	= scaleFactor > 0 ;
 				
-				var renderedX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
+				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
 				var renderedY = ((item.getY() - _cameraY) * scaleFactor) + _offsetY;
 				var renderedZ = z;
 				var scale     = scaleFactor;
 				
-				item.setRenderedX(renderedX);
+				item.renderX = renderX;
 				item.setRenderedY(renderedY);
 				item.setRenderedZ(renderedZ);
 				item.setScale(scaleFactor);
@@ -530,7 +428,7 @@ function Shinkansen (){
 			//_itemsList.sortOn("renderedZ", Array.DESCENDING | Array.NUMERIC);
 			_itemsList.sort(function(a, b){
 				if(a.getRenderedZ() == b.getRenderedZ()){
-					return a.getRenderedX() < b.getRenderedX()
+					return a.renderX < b.renderX
 				}
 				return a.getRenderedZ() < b.getRenderedZ()
 			});
@@ -547,7 +445,7 @@ function Shinkansen (){
 					callback = _callbacksList[indexCallback];
 					callback(item.getView(), 
 							 index, 
-							 item.getRenderedX(),
+							 item.renderX,
 							 item.getRenderedY(),
 							 item.getRenderedZ(),
 							 item.getScale());
