@@ -1,27 +1,42 @@
 /*
 	Version 0.0.1
-	# 3d Object
+	# Tick handler
 */
-window.isNumber = function(number){
-    var isNull   = null == number;
-    var isNotN   = isNaN(number);
-    var isString;
-    if(!isNull){
-        isString = number.length != undefined;
-    }
-    var isNotAnumber = isNull || isNotN  ||  isString;
-    if( isNotAnumber){
-        return false;
-    }
-    return true;
-}
 
 var version = 10;
 document.title = version + " Shinkansen";
 
 function Shinkansen (){
-	'use strict';
+	'use strict'
 
+	var _requestAnimationFrame = window.requestAnimationFrame;
+	if(null == _requestAnimationFrame){
+		var vendors  = ['ms', 'moz', 'webkit', 'o'];
+		
+		for(var x = 0; x < vendors.length && !_requestAnimationFrame; ++x) {
+			_requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+		}
+		
+		if (!_requestAnimationFrame){
+			_requestAnimationFrame = function(callback) {
+				setTimeout(callback, 10);
+			};
+		}
+	}
+	
+	var isNumber = function(number){
+		var isNull   = null == number;
+		var isNotN   = isNaN(number);
+		var isString;
+		if(!isNull){
+			isString = number.length != undefined;
+		}
+		var isNotAnumber = isNull || isNotN  ||  isString;
+		if( isNotAnumber){
+			return false;
+		}
+		return true;
+	}
 	// ::: EMITTER ::: //
 	var Event = function(type, data){
 		this.type = type;
@@ -376,7 +391,6 @@ function Shinkansen (){
 		this.setViewPortX = function (value) {
 			if(isNumber(value)){
 				_viewPortX = value;
-				_self.doRender();
 			}
 			return _viewPortX;
 		}
@@ -385,7 +399,6 @@ function Shinkansen (){
 		this.setViewPortY = function (value) {
 			if(isNumber(value)){
 				_viewPortY = value;
-				_self.doRender();
 			}
 			return _viewPortY;
 		}
@@ -415,7 +428,6 @@ function Shinkansen (){
 				throw new Error("Can not add a null item");
 			}
 			_itemsList.push(item);
-			_self.doRender();
 			emitEvent(Shinkansen.ADD, item);
 		}
 		
@@ -426,7 +438,6 @@ function Shinkansen (){
 				return;
 			}
 			_itemsList.splice(index, 1);
-			_self.doRender();
 			emitEvent(Shinkansen.REMOVE, item);
 		}
 		
@@ -436,7 +447,6 @@ function Shinkansen (){
 		this.setOffsetY = function (value) {
 			if(isNumber(value)){
 				_offsetY = value;
-				_self.doRender();
 			}
 			return _offsetY;
 		}
@@ -445,7 +455,6 @@ function Shinkansen (){
 		this.setOffsetX = function (value) {
 			if(isNumber(value)){
 				_offsetX = value;
-				_self.doRender();
 			}
 			return _offsetX;
 		}
@@ -454,7 +463,6 @@ function Shinkansen (){
 		this.setCameraX = function(value) {
 			if(isNumber(value)){
 				_cameraX = value;
-				_self.doRender();
 				emitEvent(Shinkansen.CAMERA_X, _cameraX);
 			}
 			return _cameraX;
@@ -464,7 +472,6 @@ function Shinkansen (){
 		this.setCameraY = function(value) {
 			if(isNumber(value)){
 				_cameraY = value;
-				_self.doRender();
 				emitEvent(Shinkansen.CAMERA_Y, _cameraY);
 			}
 			return _cameraY;
@@ -474,7 +481,6 @@ function Shinkansen (){
 		this.setCameraZ = function(value) {
 			if(isNumber(value)){
 				_cameraZ = value;
-				_self.doRender();
 				emitEvent(Shinkansen.CAMERA_Z, _cameraZ);
 			}
 			return _cameraZ;
@@ -493,7 +499,6 @@ function Shinkansen (){
 			if(isNumber(value)){
 				_radian = value;
 				_angle  = getAngleFromRadian(_radian);
-				_self.doRender();
 				emitEvent(Shinkansen.ANGLE, _angle);
 				emitEvent(Shinkansen.RADIAN, _radian);
 			}
@@ -504,13 +509,12 @@ function Shinkansen (){
 		this.setFocalLength = function(value) {
 			if(isNumber(value)){
 				_focalLength = value;
-				_self.doRender();
 				emitEvent(Shinkansen.FOCAL_LENGTH, _focalLength);
 			}
 			return _focalLength;
 		}
 
-		this.doRender = function(notForce) {
+		this.doRender = function() {
 			var length = _itemsList.length;
 			if(0 == length){
 				// Early return
@@ -722,6 +726,12 @@ function Shinkansen (){
 			var finalValue = typeof(value) === "undefined" ? defaultValue : value;
 			return finalValue;
 		}
+
+		var update = function(){
+			_requestAnimationFrame(update);
+			_self.doRender.apply(_self);
+		}
+		_requestAnimationFrame(update);
 	}
 
 	Shinkansen.ADD			= "add";
@@ -733,6 +743,6 @@ function Shinkansen (){
 	Shinkansen.RADIAN		= "radian";
 	Shinkansen.FOCAL_LENGTH	= "focalLength";
 	Shinkansen.RENDER		= "render";
-	
+
 	return new Shinkansen();
 }
