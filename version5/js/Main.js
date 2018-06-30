@@ -46,13 +46,8 @@ var y;
 			camera -= 1;
 		}, 30);
 	
-	function onRender(view, index, x, y, z, scale) {
-		if(scale == 0){
-			view.style.display = "none";
-			return;
-		}else{
-			view.style.display = "inline";
-		}
+	function onRender(view, index, x, y, z, scale, visible) {
+		view.style.display = visible ? "inline" : "none";
 		view.style.left    = x + "px";
 		view.style.top     = y + "px";
 		view.style.width   = (scale*99) + "px";

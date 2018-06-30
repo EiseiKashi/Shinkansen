@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D properties update - renderZ
+	# Clip 3D properties update - visible
 */
 
 var version = 10;
@@ -152,35 +152,25 @@ function Shinkansen (){
 	}
 	
 	var clipIdCounter = 0;
-	var Clip3D = function (view, x, y, z) {
+	var Clip3D = function (data, x, y, z) {
 		'use strict';
 		var _id			= clipIdCounter;
+		this.getId = function() {
+			return _id;
+		}
 		clipIdCounter++;
-
-		var _view		= null != view ? view : null;
+		
 		var _x			= isNumber(x) ? x : 0;
 		var _y			= isNumber(y) ? y : 0;
 		var _z			= isNumber(z) ? z : 0;
 		
+		this.data		= data;
 		this.renderX	= 0;
 		this.renderY	= 0;
 		this.renderZ	= 0;
+		this.scale      = 0;
+		this.visible	= true;
 		
-		var _visible	= true;
-		
-		var _scale		= 0;
-		
-		this.getId = function() {
-			return _view != null ? _view.name : null;
-		}
-		
-		this.getView = function() {return _view;}
-		this.setView = function(value) {
-			if (null != value) {
-				_view = value;
-			}
-			return _view;
-		}
 		
 		this.getX = function() {return _x;}
 		this.setX = function(value) {
@@ -204,19 +194,6 @@ function Shinkansen (){
 				_z = value;
 			}
 			return _z;
-		}
-		
-		this.getScale = function() {return _scale;}
-		this.setScale = function(value) {
-			if(isNumber(value)){
-				_scale = value;
-			}
-			return _scale;
-		}
-		
-		this.getVisible = function() {return _visible;}
-		this.setVisible = function(value) {
-			_visible = value;
 		}
 
 		this.addEventListener = function(type, listener, context){
@@ -307,8 +284,8 @@ function Shinkansen (){
 			_callbacksList.splice(index, 1);
 		}
 		
-		this.addNew = function(view, x, y, z){
-			var item = new Clip3D(view, x, y, z);
+		this.addNew = function(data, x, y, z){
+			var item = new Clip3D(data, x, y, z);
 			_self.add(item);
 			return item;
 		}
@@ -379,8 +356,8 @@ function Shinkansen (){
 				isInRange		= checkIsInRange(itemX, itemY);
 				
 				if (!isInRange) {
-					item.setVisible(false);
-					item.setScale(0);
+					item.visible = false;
+					item.scale   = 0;
 					index++;
 					continue;
 				}
@@ -404,7 +381,7 @@ function Shinkansen (){
 				item.renderX = renderX;
 				item.renderY = renderY;
 				item.render  = renderZ;
-				item.setScale(scaleFactor);
+				item.scale	 = scaleFactor;
 				
 				index++;
 			}
@@ -427,12 +404,13 @@ function Shinkansen (){
 				indexCallback = 0;
 				while (indexCallback < callbacksLenght) {
 					callback = _callbacksList[indexCallback];
-					callback(item.getView(), 
+					callback(item.data, 
 							 index, 
 							 item.renderX,
 							 item.renderY,
 							 item.renderZ,
-							 item.getScale());
+							 item.scale,
+							 item.visible);
 					indexCallback++
 				}
 				index++
