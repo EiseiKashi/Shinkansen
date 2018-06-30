@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Properties checker
+	# Properties polishing
 */
 
 var version = 10;
@@ -353,27 +353,30 @@ function Shinkansen (){
 	var Shinkansen = function() {
 		'use strict';
 		var _self			= this;
-		var _emitter		= new Emitter(this);
-		var PI2				= Math.PI * 2;
-		
-		var _itemsList		= new Array();
-		var _callbacksList	= new Array();
-		
-		var _radian			= 0;
-		var _focalLength	= 300;
-		
-		var _offsetX		= 0;
-		var _offsetY		= 0;
 		
 		this.cameraX;
 		this.cameraY;
 		this.cameraZ;
 		this.focalLength;
 		this.rotation;
-
+		
 		var _cameraX		= 0;
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
+		var _focalLength	= 300;
+		var _rotation;
+		
+		var _emitter		= new Emitter(this);
+		
+		var PI2				= Math.PI * 2;
+		
+		var _itemsList		= new Array();
+		var _callbacksList	= new Array();
+		
+		var _radian			= 0;
+		
+		var _offsetX		= 0;
+		var _offsetY		= 0;
 		
 		var _cameraX1		= -1;
 		var _cameraX2		= 1;
@@ -385,7 +388,6 @@ function Shinkansen (){
 		
 		var _visionRadian;
 		var _pointLength;
-		var _rotation;
 		var _slope;
 		var _interceptorY;
 		
