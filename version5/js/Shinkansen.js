@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D properties update - renderY
+	# Clip 3D properties update - renderZ
 */
 
 var version = 10;
@@ -164,7 +164,7 @@ function Shinkansen (){
 		
 		this.renderX	= 0;
 		this.renderY	= 0;
-		var _renderZ	= 0;
+		this.renderZ	= 0;
 		
 		var _visible	= true;
 		
@@ -204,14 +204,6 @@ function Shinkansen (){
 				_z = value;
 			}
 			return _z;
-		}
-		
-		this.getRenderedZ = function() {return _renderZ;}
-		this.setRenderedZ = function(value) {
-			if (isNumber(value)) {
-				_renderZ = value;
-			}
-			return _renderZ;
 		}
 		
 		this.getScale = function() {return _scale;}
@@ -406,23 +398,23 @@ function Shinkansen (){
 				
 				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
 				var renderY = ((item.getY() - _cameraY) * scaleFactor) + _offsetY;
-				var renderedZ = z;
-				var scale     = scaleFactor;
+				var renderZ = z;
+				var scale    = scaleFactor;
 				
 				item.renderX = renderX;
 				item.renderY = renderY;
-				item.setRenderedZ(renderedZ);
+				item.render  = renderZ;
 				item.setScale(scaleFactor);
 				
-				index++
+				index++;
 			}
 			
-			//_itemsList.sortOn("renderedZ", Array.DESCENDING | Array.NUMERIC);
+			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
 			_itemsList.sort(function(a, b){
-				if(a.getRenderedZ() == b.getRenderedZ()){
-					return a.renderX < b.renderX
+				if(a.renderZ == brenderZ){
+					return a.renderX < b.renderX;
 				}
-				return a.getRenderedZ() < b.getRenderedZ()
+				return a.renderZ < b.renderZ;
 			});
 			
 			index = 0;
@@ -439,7 +431,7 @@ function Shinkansen (){
 							 index, 
 							 item.renderX,
 							 item.renderY,
-							 item.getRenderedZ(),
+							 item.renderZ,
 							 item.getScale());
 					indexCallback++
 				}
