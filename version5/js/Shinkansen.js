@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Properties polishing
+	# Shinkansen Properties polishing
 */
 
 var version = 10;
