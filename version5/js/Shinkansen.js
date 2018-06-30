@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D properties update - visible
+	# Clip 3D properties update - x, y, z
 */
 
 var version = 10;
@@ -160,9 +160,9 @@ function Shinkansen (){
 		}
 		clipIdCounter++;
 		
-		var _x			= isNumber(x) ? x : 0;
-		var _y			= isNumber(y) ? y : 0;
-		var _z			= isNumber(z) ? z : 0;
+		this.x			= isNumber(x) ? x : 0;
+		this.y			= isNumber(y) ? y : 0;
+		this.z			= isNumber(z) ? z : 0;
 		
 		this.data		= data;
 		this.renderX	= 0;
@@ -171,31 +171,6 @@ function Shinkansen (){
 		this.scale      = 0;
 		this.visible	= true;
 		
-		
-		this.getX = function() {return _x;}
-		this.setX = function(value) {
-			if (isNumber(value)) {
-				_x = value;
-			}
-			return _x;
-		}
-		
-		this.getY = function() {return _y;}
-		this.setY = function(value) {
-			if (isNumber(value)) {
-				_y = value;
-			}
-			return _y;
-		}
-		
-		this.getZ = function() {return _z;}
-		this.setZ = function(value) {
-			if (isNumber(value)) {
-				_z = value;
-			}
-			return _z;
-		}
-
 		this.addEventListener = function(type, listener, context){
             _emitter.addEventListener(type, listener, context);
         }
@@ -349,8 +324,8 @@ function Shinkansen (){
 			
 			while (index < length) {
 				item	= _itemsList[index];
-				itemX	= item.getX()
-				itemY	= item.getZ()
+				itemX	= item.x;
+				itemY	= item.z;
 				
 				 var intersect	=  getPointIntersection(itemX, itemY);
 				isInRange		= checkIsInRange(itemX, itemY);
@@ -374,7 +349,7 @@ function Shinkansen (){
 				item.visible	= scaleFactor > 0 ;
 				
 				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
-				var renderY = ((item.getY() - _cameraY) * scaleFactor) + _offsetY;
+				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
 				var renderZ = z;
 				var scale    = scaleFactor;
 				
