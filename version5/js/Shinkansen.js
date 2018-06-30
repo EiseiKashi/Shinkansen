@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D properties update - renderX
+	# Clip 3D properties update - renderY
 */
 
 var version = 10;
@@ -163,7 +163,7 @@ function Shinkansen (){
 		var _z			= isNumber(z) ? z : 0;
 		
 		this.renderX	= 0;
-		var _renderY	= 0;
+		this.renderY	= 0;
 		var _renderZ	= 0;
 		
 		var _visible	= true;
@@ -204,14 +204,6 @@ function Shinkansen (){
 				_z = value;
 			}
 			return _z;
-		}
-		
-		this.getRenderedY = function() {return _renderY;}
-		this.setRenderedY = function(value) {
-			if (isNumber(value)) {
-				_renderY = value;
-			}
-			return _renderY;
 		}
 		
 		this.getRenderedZ = function() {return _renderZ;}
@@ -413,12 +405,12 @@ function Shinkansen (){
 				item.visible	= scaleFactor > 0 ;
 				
 				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
-				var renderedY = ((item.getY() - _cameraY) * scaleFactor) + _offsetY;
+				var renderY = ((item.getY() - _cameraY) * scaleFactor) + _offsetY;
 				var renderedZ = z;
 				var scale     = scaleFactor;
 				
 				item.renderX = renderX;
-				item.setRenderedY(renderedY);
+				item.renderY = renderY;
 				item.setRenderedZ(renderedZ);
 				item.setScale(scaleFactor);
 				
@@ -446,7 +438,7 @@ function Shinkansen (){
 					callback(item.getView(), 
 							 index, 
 							 item.renderX,
-							 item.getRenderedY(),
+							 item.renderY,
 							 item.getRenderedZ(),
 							 item.getScale());
 					indexCallback++
