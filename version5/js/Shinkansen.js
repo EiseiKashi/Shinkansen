@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Shinkansen Properties polishing
+	# Clip 3D properties update - 1
 */
 
 var version = 10;
@@ -550,9 +550,7 @@ function Shinkansen (){
 							 item.getRenderedX(),
 							 item.getRenderedY(),
 							 item.getRenderedZ(),
-							 item.getScale(),
-							 index == 0,
-							 index == lastIndex);
+							 item.getScale());
 					indexCallback++
 				}
 				index++

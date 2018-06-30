@@ -46,7 +46,7 @@ var y;
 			camera -= 1;
 		}, 30);
 	
-	function onRender(view, index,x, y, z, scale, isFirstItem, isLastItem) {
+	function onRender(view, index, x, y, z, scale) {
 		if(scale == 0){
 			view.style.display = "none";
 			return;
