@@ -1,8 +1,18 @@
 var canvas 		  = document.getElementById("map");
 	canvas.width  = 600;
-	canvas.height = 600;
+	canvas.height = 150;
 
 var canvate = new Canvate(canvas);
+//var cameraIcon = canvate.addNewByURL("img/camera.png");
+
+var rate = .5;
+
+function addToCanvate(node){
+	var img = canvate.addNew(node);
+		img.setScale(rate/5, rate/5);
+		img.x = x*rate;
+		img.y = y*rate;
+}
 
 var shinkansen;
 	shinkansen = new Shinkansen();
@@ -10,10 +20,10 @@ var shinkansen;
 	shinkansen.setViewPortY (200);
 	shinkansen.setOffsetX   (200 / 2);
 	shinkansen.setOffsetY   (200 / 2);
-		
+
 var node;
 var item;
-		
+	
 var _size			= 120;
 var fracc			= 120;
 var totalColumns	= 5;
@@ -32,11 +42,9 @@ while (rowIndex < totalRows) {
 		x		= columnIndex*_size;
 		y		= rowIndex*_size;
 		item	= shinkansen.addNew(node, x, 0, y);
-		var rate = .5;
-		var img = canvate.addNew(node);
-			img.setScale(rate/5, rate/5);
-			img.x = x*rate;
-			img.y = y*rate;
+		
+		addToCanvate(node);
+
 		index++
 		columnIndex ++;
 	}
