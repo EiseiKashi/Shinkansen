@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D properties update - x, y, z
+	# Clip 3D updateProperties
 */
 
 var version = 10;
@@ -154,15 +154,17 @@ function Shinkansen (){
 	var clipIdCounter = 0;
 	var Clip3D = function (data, x, y, z) {
 		'use strict';
+
 		var _id			= clipIdCounter;
-		this.getId = function() {
-			return _id;
-		}
 		clipIdCounter++;
 		
-		this.x			= isNumber(x) ? x : 0;
-		this.y			= isNumber(y) ? y : 0;
-		this.z			= isNumber(z) ? z : 0;
+		var _x;
+		var _y;
+		var _z;
+
+		this.x			= _x = isNumber(x) ? x : 0;
+		this.y			= _y = isNumber(y) ? y : 0;
+		this.z			= _z = isNumber(z) ? z : 0;
 		
 		this.data		= data;
 		this.renderX	= 0;
@@ -170,6 +172,30 @@ function Shinkansen (){
 		this.renderZ	= 0;
 		this.scale      = 0;
 		this.visible	= true;
+
+		this.getId = function() {
+			return _id;
+		}
+
+		this.updateProperties = function(){
+			if(_x != this.x){
+				if(isNumber(this.x)){
+					_x = this.x;
+				}
+			}
+
+			if(_y != this.y){
+				if(isNumber(this.y)){
+					_x = this.y;
+				}
+			}
+
+			if(_z != this.z){
+				if(isNumber(this.z)){
+					_x = this.z;
+				}
+			}
+		}
 		
 		this.addEventListener = function(type, listener, context){
             _emitter.addEventListener(type, listener, context);
@@ -183,6 +209,8 @@ function Shinkansen (){
 			_emitter.emit(type, data); 
 		}
 	}
+
+
 
 	var Shinkansen = function() {
 		'use strict';
@@ -324,6 +352,8 @@ function Shinkansen (){
 			
 			while (index < length) {
 				item	= _itemsList[index];
+				item.updateProperties();
+
 				itemX	= item.x;
 				itemY	= item.z;
 				
