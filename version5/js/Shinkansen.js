@@ -411,8 +411,8 @@ function Shinkansen (){
 			
 			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
 			_itemsList.sort(function(a, b){
-				if(a.renderZ == brenderZ){
-					return a.renderX < b.renderX;
+				if(a.renderZ == b.renderZ){
+					return a.renderZ < b.renderZ;
 				}
 				return a.renderZ < b.renderZ;
 			});
