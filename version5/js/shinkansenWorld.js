@@ -1,9 +1,10 @@
 var shinkansen;
 shinkansen = new Shinkansen();
-shinkansen.setViewPortX (800);
-shinkansen.setViewPortY (600);
-shinkansen.setOffsetX   (800 / 2);
-shinkansen.setOffsetY   (600 / 2);
+var viewPort = 300;
+shinkansen.setViewPortX (viewPort);
+shinkansen.setViewPortY (viewPort);
+shinkansen.setOffsetX   (viewPort / 2);
+shinkansen.setOffsetY   (viewPort/3);
 		
 var node;
 var item;

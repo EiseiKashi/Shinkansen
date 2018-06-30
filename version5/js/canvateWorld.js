@@ -67,3 +67,5 @@ function init(){
 	cameraIcon.startDrag();
 	cameraIcon.addEventListener("draging", onDraging);
 }
+
+setTimeout(init, 2000);

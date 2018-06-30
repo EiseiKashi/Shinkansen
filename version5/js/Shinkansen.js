@@ -382,10 +382,13 @@ function Shinkansen (){
 			
 			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
 			_itemsList.sort(function(a, b){
-				if(a.renderZ == b.renderZ){
-					return a.renderZ < b.renderZ;
+				if(a.scale == b.scale){
+					return 0;
+				}else if(a.scale < b.scale){
+					return -1;
+				}else if(a.scale > b.scale){
+					return 1;
 				}
-				return a.renderZ < b.renderZ;
 			});
 			
 			index = 0;
