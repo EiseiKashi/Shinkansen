@@ -32,17 +32,17 @@ var y;
 			rowIndex++;
 		}
 		
-		shinkansen.setCameraX(570);
-		shinkansen.setCameraY(0);
+		shinkansen.cameraX = 570;
+		shinkansen.cameraY = 0;
+		shinkansen.cameraZ = 15;
+		
 		var camera = 570;
-		shinkansen.setCameraZ(15);
 		
 		shinkansen.addCallback(onRender);
-		
-		shinkansen.setAngle(90);
+		shinkansen.rotation = 90;
 		
 		setInterval(function(){
-			shinkansen.setCameraX(camera);
+			shinkansen.cameraX = camera;
 			camera -= 1;
 		}, 30);
 	

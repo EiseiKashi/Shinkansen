@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Tick handler
+	# Properties checker
 */
 
 var version = 10;
@@ -365,6 +365,12 @@ function Shinkansen (){
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 		
+		this.cameraX;
+		this.cameraY;
+		this.cameraZ;
+		this.focalLength;
+		this.rotation;
+
 		var _cameraX		= 0;
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
@@ -379,7 +385,7 @@ function Shinkansen (){
 		
 		var _visionRadian;
 		var _pointLength;
-		var _angle;
+		var _rotation;
 		var _slope;
 		var _interceptorY;
 		
@@ -457,61 +463,6 @@ function Shinkansen (){
 				_offsetX = value;
 			}
 			return _offsetX;
-		}
-		
-		this.getCameraX = function(){return _cameraX;}
-		this.setCameraX = function(value) {
-			if(isNumber(value)){
-				_cameraX = value;
-				emitEvent(Shinkansen.CAMERA_X, _cameraX);
-			}
-			return _cameraX;
-		}
-		
-		this.getCameraY = function(){return _cameraY;}
-		this.setCameraY = function(value) {
-			if(isNumber(value)){
-				_cameraY = value;
-				emitEvent(Shinkansen.CAMERA_Y, _cameraY);
-			}
-			return _cameraY;
-		}
-		
-		this.getCameraZ = function() {return _cameraZ;}
-		this.setCameraZ = function(value) {
-			if(isNumber(value)){
-				_cameraZ = value;
-				emitEvent(Shinkansen.CAMERA_Z, _cameraZ);
-			}
-			return _cameraZ;
-		}
-		
-		this.getAngle = function() {return _angle;}
-		this.setAngle = function(value) {
-			if(isNumber(value)){
-				_self.setRadian(getRadianFromAngle(value));
-			}
-			return _angle;
-		}
-		
-		this.getRadian = function() {return _radian;}
-		this.setRadian = function(value) {
-			if(isNumber(value)){
-				_radian = value;
-				_angle  = getAngleFromRadian(_radian);
-				emitEvent(Shinkansen.ANGLE, _angle);
-				emitEvent(Shinkansen.RADIAN, _radian);
-			}
-			return _radian;
-		}
-		
-		this.getFocalLength = function() {return _focalLength;}
-		this.setFocalLength = function(value) {
-			if(isNumber(value)){
-				_focalLength = value;
-				emitEvent(Shinkansen.FOCAL_LENGTH, _focalLength);
-			}
-			return _focalLength;
 		}
 
 		this.doRender = function() {
@@ -631,15 +582,55 @@ function Shinkansen (){
 			return hypotenuse;
 		}
 		
-		var getRadianFromAngle  = function(degree){
+		var getRadianFromRotation  = function(degree){
 			return degree * (PI2/360);
 		}
 		
-		var getAngleFromRadian  = function(radian) {
+		var getRotationFromRadian  = function(radian) {
 			return radian * (360/PI2);
 		}
 		
 		var updateProperties  = function() {
+			if(_cameraX != _self.cameraX){
+				if(isNumber(_self.cameraX)){
+					_cameraX = _self.cameraX;
+				}else{
+					_self.cameraX = _cameraX;
+				}
+			}
+
+			if(_cameraY != _self.cameraY){
+				if(isNumber(_self.cameraY)){
+					_cameraY = _self.cameraY;
+				}else{
+					_self.cameraY = _cameraY;
+				}
+			}
+
+			if(_cameraZ != _self.cameraZ){
+				if(isNumber(_self.cameraZ)){
+					_cameraZ = _self.cameraZ;
+				}else{
+					_self.cameraZ = _cameraZ;
+				}
+			}
+
+			if(_focalLength != _self.focalLength){
+				if(isNumber(_self.focalLength)){
+					_focalLength = _self.focalLength;
+				}else{
+					_self.focalLength = _focalLength;
+				}
+			}
+
+			if(isNumber(_self.rotation) && _self.rotation != _rotation){
+				var radian = getRadianFromRotation(_self.rotation);
+				if(isNumber(radian)){
+					_radian = radian;
+					_rotation  = getRotationFromRadian(radian);
+				}
+			}
+			
 			var halfViewPort	= _viewPortX / 2;
 			var visionLength	= getHipotenuse(halfViewPort, _focalLength);
 			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
@@ -739,7 +730,7 @@ function Shinkansen (){
 	Shinkansen.CAMERA_X		= "cameraX";
 	Shinkansen.CAMERA_Y		= "cameraY";
 	Shinkansen.CAMERA_Z		= "cameraZ";
-	Shinkansen.ANGLE		= "angle";
+	Shinkansen.ROTATION		= "Rotation";
 	Shinkansen.RADIAN		= "radian";
 	Shinkansen.FOCAL_LENGTH	= "focalLength";
 	Shinkansen.RENDER		= "render";
