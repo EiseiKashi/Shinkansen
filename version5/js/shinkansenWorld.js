@@ -41,7 +41,7 @@ var camera = 570;
 shinkansen.addCallback(onRender);
 shinkansen.rotation = 90;
 
-setInterval(function(){
+var intervalId = setInterval(function(){
 	shinkansen.cameraX = camera;
 	camera -= 1;
 }, 30);
