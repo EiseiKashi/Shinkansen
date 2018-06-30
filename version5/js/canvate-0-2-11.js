@@ -1,4 +1,4 @@
-/* "VERSION 0.2.10"
+/* "VERSION 0.2.11"
 # FIX addNewByURL and addNewById
 
 minified by https://javascript-minifier.com/
@@ -46,15 +46,15 @@ window.Canvate = function(element) {
     var MOUSE_DOWN      = "mouseDown";
     var MOUSE_LEAVE     = "mouseLeave";
     var CLICK           = "click";
-    var DRAG            = "drag";
     var DROP            = "drop";
+    var DRAG            = "drag";
+    var DRAGING         = "draging";
     var FUNCTION        = "function";
     var OBJECT          = "object";
     var CANVAS          = "canvas";
     var D2              = "2d";
     var IMG             = "img";
     var IMG_PNG         = "image/png";
-    var ANONYMOUS       = "Anonymous";
     var DESTINATION_IN  = "destination-in";
     var SOURCE_OVER     = "source-over";
     var SOURCE_IN       = "source-in";
@@ -607,7 +607,6 @@ window.Canvate = function(element) {
             
             
             var img             = document.createElement(IMG);
-                img.crossOrigin = ANONYMOUS;
                 img.src         = canvas.toDataURL(IMG_PNG);
             
             this.setImage(canvas);
@@ -622,7 +621,6 @@ window.Canvate = function(element) {
                 return;
             }
             _image             = image;
-            _image.crossOrigin = ANONYMOUS;
             
             _initialWidth  = image.naturalWidth;
             _initialHeight = image.naturalHeight;
@@ -693,7 +691,6 @@ window.Canvate = function(element) {
         
         this.setImageById = function(id){
             var image = document.getElementById(id);
-                image.crossOrigin = ANONYMOUS;
             if(image == null){
                 throw "There is no element with the id: " + id;
                 return;
@@ -714,7 +711,6 @@ window.Canvate = function(element) {
                     emit(_self.IMAGE_ERROR, {src:src})
                 }
                 var antiCache     = isAntiCache ? '?' + new Date().getTime() : "";
-                image.crossOrigin = ANONYMOUS;
                 image.src         = src + antiCache;
         }
         
@@ -769,7 +765,6 @@ window.Canvate = function(element) {
                 context.fillRect(0,0,width,height);
             
             var img               = document.createElement(IMG);
-                img.crossOrigin   = ANONYMOUS;
                 img.src           = canvas.toDataURL(IMG_PNG);
             
             this.setImage(canvas);
@@ -1509,7 +1504,9 @@ window.Canvate = function(element) {
                        };
             
             emit(_self.RENDER, {});
-
+            if(_isDraging){
+                emit(DRAGING, this);
+            }
             if(_isConvertion){
                 _isConvertion = false;
                 this.setImage(_image);

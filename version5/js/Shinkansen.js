@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Clip 3D updateProperties
+	# Remove Viewport
 */
 
 var version = 10;

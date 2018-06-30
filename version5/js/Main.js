@@ -1,29 +1,13 @@
-var canvas 		  = document.getElementById("map");
-	canvas.width  = 600;
-	canvas.height = 150;
-
-var canvate = new Canvate(canvas);
-//var cameraIcon = canvate.addNewByURL("img/camera.png");
-
-var rate = .5;
-
-function addToCanvate(node){
-	var img = canvate.addNew(node);
-		img.setScale(rate/5, rate/5);
-		img.x = x*rate;
-		img.y = y*rate;
-}
-
 var shinkansen;
-	shinkansen = new Shinkansen();
-	shinkansen.setViewPortX (200);
-	shinkansen.setViewPortY (200);
-	shinkansen.setOffsetX   (200 / 2);
-	shinkansen.setOffsetY   (200 / 2);
-
+shinkansen = new Shinkansen();
+shinkansen.setViewPortX (800);
+shinkansen.setViewPortY (600);
+shinkansen.setOffsetX   (800 / 2);
+shinkansen.setOffsetY   (600 / 2);
+		
 var node;
 var item;
-	
+		
 var _size			= 120;
 var fracc			= 120;
 var totalColumns	= 5;
@@ -42,19 +26,16 @@ while (rowIndex < totalRows) {
 		x		= columnIndex*_size;
 		y		= rowIndex*_size;
 		item	= shinkansen.addNew(node, x, 0, y);
-		
-		addToCanvate(node);
-
 		index++
 		columnIndex ++;
 	}
 	rowIndex++;
 }
-
+		
 shinkansen.cameraX = 570;
 shinkansen.cameraY = 0;
 shinkansen.cameraZ = 15;
-
+		
 var camera = 570;
 
 shinkansen.addCallback(onRender);
@@ -64,7 +45,7 @@ setInterval(function(){
 	shinkansen.cameraX = camera;
 	camera -= 1;
 }, 30);
-
+	
 function onRender(view, index, x, y, z, scale, visible) {
 	view.style.display = visible ? "inline" : "none";
 	view.style.left    = x + "px";
