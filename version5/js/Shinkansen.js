@@ -38,11 +38,6 @@ function Shinkansen (){
 		return true;
 	}
 	// ::: EMITTER ::: //
-	var Event = function(type, data){
-		this.type = type;
-		this.data = data;
-	}
-
     var Emitter = function(target){
         'use strict';
         var _typeCounter   = 0;
@@ -181,32 +176,26 @@ function Shinkansen (){
 			if(_x != this.x){
 				if(isNumber(this.x)){
 					_x = this.x;
+				}else{
+					this.x = _x
 				}
 			}
 
 			if(_y != this.y){
 				if(isNumber(this.y)){
-					_x = this.y;
+					_y = this.y;
+				}else{
+					this.y = _y
 				}
 			}
 
 			if(_z != this.z){
 				if(isNumber(this.z)){
-					_x = this.z;
+					_z = this.z;
+				}else{
+					this.z = _z
 				}
 			}
-		}
-		
-		this.addEventListener = function(type, listener, context){
-            _emitter.addEventListener(type, listener, context);
-        }
-        
-        this.removeEventListener = function(type, listener, context){
-			_emitter.removeEventListener(type, listener, context);
-		}
-		
-		var emit =function(type, data){
-			_emitter.emit(type, data); 
 		}
 	}
 
