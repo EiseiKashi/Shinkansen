@@ -147,7 +147,7 @@ function Shinkansen (){
 	}
 	
 	var clipIdCounter = 0;
-	var Clip3D = function (view, x, y, z) {
+	var Clip3D = function (view, x, y, z, callback, context) {
 		'use strict';
 
 		var _id		= clipIdCounter;
@@ -160,11 +160,19 @@ function Shinkansen (){
 		var _y;
 		var _z;
 
-		this.x		= x;
-		this.y		= y;
-		this.z		= z;
+		this.x			= x;
+		this.y			= y;
+		this.z			= z;
+		this.view		= view;
+		this.callback	= callback;
+		this.context	= context;
 
-		this.view	= view;
+		this.renderX;
+		this.renderY;
+		this.renderZ;
+		this.scale;
+		this.visible;
+		this.depth;
 
 		this.updateProperties = function(){
 			if(_x != this.x){
@@ -190,6 +198,19 @@ function Shinkansen (){
 					this.z = _z
 				}
 			}
+		}
+
+		this.setRender = function(x, y, z, scale, visible, depth){
+			this.renderX = x;
+			this.renderY = y;
+			this.renderZ = z;
+			this.scale	 = scale;
+			this.visible = visible;
+			this.depth   = depth;
+		}
+
+		this.emit = function(){
+			this.callback(this.context, [this]);
 		}
 	}
 
@@ -373,7 +394,6 @@ function Shinkansen (){
 			
 			var dx;
 			var dy;
-			var z;
 			var item;
 			var itemX;
 			var itemY;
@@ -388,8 +408,8 @@ function Shinkansen (){
 			var renderY;
 			var renderZ;
 			var index  = 0;
-			
-			while (index < length) {
+			var length = _itemsList.length;
+			for (var index=0; index < length; index++) {
 				item		= _itemsList[index];
 				item.updateProperties();
 				
@@ -423,7 +443,7 @@ function Shinkansen (){
 				item.renderY 	= renderY;
 				item.render  	= renderZ;
 				item.scale	 	= scaleFactor;
-				
+
 				index++;
 			}
 			
@@ -437,6 +457,12 @@ function Shinkansen (){
 					return 1;
 				}
 			});
+
+			var length = _itemsList.length;
+			for (var index=0; index < length; index++) {
+				item = _itemsList[index];
+				item.emit();
+			}
 			
 			emitEvent(Shinkansen.RENDER);
 

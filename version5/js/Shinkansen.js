@@ -147,7 +147,7 @@ function Shinkansen (){
 	}
 	
 	var clipIdCounter = 0;
-	var Clip3D = function (view, x, y, z) {
+	var Clip3D = function (view, x, y, z, callback, context) {
 		'use strict';
 
 		var _id		= clipIdCounter;
@@ -163,6 +163,12 @@ function Shinkansen (){
 		this.x		= x;
 		this.y		= y;
 		this.z		= z;
+
+		this.renderX;
+		this.renderY;
+		this.renderZ;
+		this.scale;
+		this.visible;
 
 		this.view	= view;
 
@@ -190,6 +196,10 @@ function Shinkansen (){
 					this.z = _z
 				}
 			}
+		}
+
+		this.setRender = function(x, y, z, scale, visible){
+			callback.apply(context, [this])
 		}
 	}
 
