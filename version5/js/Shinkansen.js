@@ -147,30 +147,24 @@ function Shinkansen (){
 	}
 	
 	var clipIdCounter = 0;
-	var Clip3D = function (data, x, y, z) {
+	var Clip3D = function (view, x, y, z) {
 		'use strict';
 
-		var _id			= clipIdCounter;
+		var _id		= clipIdCounter;
+		this.getId	= function() {
+			return _id;
+		}
 		clipIdCounter++;
 		
 		var _x;
 		var _y;
 		var _z;
 
-		this.x			= _x = isNumber(x) ? x : 0;
-		this.y			= _y = isNumber(y) ? y : 0;
-		this.z			= _z = isNumber(z) ? z : 0;
-		
-		this.data		= data;
-		this.renderX	= 0;
-		this.renderY	= 0;
-		this.renderZ	= 0;
-		this.scale      = 0;
-		this.visible	= true;
+		this.x		= x;
+		this.y		= y;
+		this.z		= z;
 
-		this.getId = function() {
-			return _id;
-		}
+		this.view	= view;
 
 		this.updateProperties = function(){
 			if(_x != this.x){
@@ -371,12 +365,11 @@ function Shinkansen (){
 				
 				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
 				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
-				var renderZ = z;
-				var scale    = scaleFactor;
+				var renderZ = radius;
 				
 				item.renderX = renderX;
 				item.renderY = renderY;
-				item.render  = renderZ;
+				item.renderZ = renderZ;
 				item.scale	 = scaleFactor;
 				
 				index++;
