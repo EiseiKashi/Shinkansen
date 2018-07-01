@@ -495,12 +495,29 @@ function Shinkansen (){
 			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
 			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
 			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian,     _cameraX, _cameraZ);
+			_pointLength		= getRotatedPoint(0, _focalLength,  _radian, _cameraX, _cameraZ);
 
+			var test 		 = getRotatedPoint(60, 0,  _radian, _cameraX, _cameraZ);
 			_self.debuger.x  = _cameraX;
 			_self.debuger.y  = _cameraZ;
-			_self.debuger.x1 = _pointLength.x;
-			_self.debuger.y2 = _pointLength.y;
+			_self.debuger.x1 =  test.x;
+			_self.debuger.y2 =  test.y;
+			
+			var radian        = getRadianFromRotation(getRotationFromRadian(_radian) -45);
+			var test 		  = getRotatedPoint(60, 0,  radian, _cameraX, _cameraZ);
+			_self.debuger.hx  = _cameraX;
+			_self.debuger.hy  = _cameraZ;
+			_self.debuger.hx1 =  test.x;
+			_self.debuger.hy2 =  test.y;
+			
+			var radian        = getRadianFromRotation(getRotationFromRadian(_radian)+ 45);
+			var test 		  = getRotatedPoint(60, 0,  radian, _cameraX, _cameraZ);
+			_self.debuger.mx  = _cameraX;
+			_self.debuger.my  = _cameraZ;
+			_self.debuger.mx1 =  test.x;
+			_self.debuger.my2 =  test.y;
+
+			
 
 			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
 			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);

@@ -1,4 +1,3 @@
-
 function CanvateWorld(totalColumns, totalRows, size){
 	'use strict'
 	var canvas;
@@ -13,6 +12,7 @@ function CanvateWorld(totalColumns, totalRows, size){
 	var addToCanvate = function(node, x, y){
 		var img = canvate.addNew(node);
 			img.setSize(5, 5);
+			img.setPivot(.5, .5);
 			img.x = x;
 			img.y = y;
 	}
@@ -42,6 +42,8 @@ function CanvateWorld(totalColumns, totalRows, size){
 	}
 	display(totalColumns, totalRows, size);
 	cameraIcon = canvate.addNewByURL("img/camera.png");
+
+	canvate.addNewById("cameraMap");
 }
 
 var _size = 60;

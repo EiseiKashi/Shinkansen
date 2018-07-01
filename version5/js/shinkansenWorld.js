@@ -33,19 +33,22 @@ while (rowIndex < totalRows) {
 	rowIndex++;
 }
 		
-shinkansen.cameraX = 570;
+shinkansen.cameraX = 60;
 shinkansen.cameraY = 0;
-shinkansen.cameraZ = 15;
+shinkansen.cameraZ = 30;
 		
-var camera = 570;
+var camera = 0;
 
 shinkansen.addCallback(onRender);
-shinkansen.rotation = 90;
+shinkansen.rotation = 0;
 
 var intervalId = setInterval(function(){
-	shinkansen.cameraX = camera;
+	shinkansen.rotation +=10;
 	camera -= 1;
-}, 30);
+	if(camera < 0){
+		camera = 570;
+	}
+}, 500);
 	
 function onRender(view, index, x, y, z, scale, visible) {
 	view.style.display = visible ? "inline" : "none";
@@ -54,4 +57,47 @@ function onRender(view, index, x, y, z, scale, visible) {
 	view.style.width   = (scale*99) + "px";
 	view.style.height  = (scale*99) + "px";
 	view.style.zIndex  = index;
+
+
+
+	mapCanvas.width  = mapCanvas.width;
+	mapCanvas.height = mapCanvas.height;
+	var x  = shinkansen.debuger.x;
+	var y  = shinkansen.debuger.y;
+	var x1 = shinkansen.debuger.x1;
+	var y1 = shinkansen.debuger.y2;
+	map.beginPath();
+	map.moveTo(x, y);
+	map.lineTo(x1, y1);
+	map.strokeStyle = '#0000FF';
+	map.stroke();
+
+	var x  = shinkansen.debuger.hx;
+	var y  = shinkansen.debuger.hy;
+	var x1 = shinkansen.debuger.hx1;
+	var y1 = shinkansen.debuger.hy2;
+	map.beginPath();
+	map.moveTo(x, y);
+	map.lineTo(x1, y1);
+	map.strokeStyle = '#FF0000';
+	map.stroke();
+
+	var x  = shinkansen.debuger.mx;
+	var y  = shinkansen.debuger.my;
+	var x1 = shinkansen.debuger.mx1;
+	var y1 = shinkansen.debuger.my2;
+	map.beginPath();
+	map.moveTo(x, y);
+	map.lineTo(x1, y1);
+	map.strokeStyle = '#00FF00';
+	map.stroke();
 }
+
+var mapCanvas = document.getElementById("cameraMap");
+var map = mapCanvas.getContext("2d");
+mapCanvas.width = 600;
+mapCanvas.height = 200;
+
+
+
+
