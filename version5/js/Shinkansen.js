@@ -514,9 +514,9 @@ function Shinkansen (){
 			_cameraY1 			= leftPoint.y;
 			_cameraX2 			= rigthPoint.x;
 			_cameraY2 			= rigthPoint.y;
-			/*
+		
 			_slope				= (_cameraY2 - _cameraY1) / (_cameraX2 - _cameraX1);
-			_interceptorY		= _cameraY1 - _slope * _cameraX1;*/
+			_interceptorY		= _cameraY1 - _slope * _cameraX1;
 		}
 		
 		var getRotatedPoint  = function(x, y, radian, originX, originY) {
@@ -569,11 +569,13 @@ function Shinkansen (){
 			//https://www.youtube.com/watch?v=bfZ57ESvFok
 		}
 		
-		var getPointIntersection  = function(itemX, itemY) {
-			var m2 = -(1 / _slope);
-			var b2  = itemY - m2 * itemX;
-			var x2  = (b2-_interceptorY)/(_slope-m2);
-			var y2  = (m2 * x2 + b2);
+		var getPointIntersection  = function(itemX, itemY, x, y, x1, y1) {
+			var slope			= (y1 - y) / (x1 - x);
+			var interceptorY	= y1 - slope * x1;
+			var m2 				= -(1 / slope);
+			var b2  			= itemY - m2 * itemX;
+			var x2  			= (b2-interceptorY)/(slope-m2);
+			var y2  			= (m2 * x2 + b2);
 			return new Point(x2, y2);
 		}
 		

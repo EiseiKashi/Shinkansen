@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Remove Viewport
+	# New render
 */
 
 var version = 10;
@@ -244,11 +244,6 @@ function Shinkansen (){
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 		
-		var _cameraX1		= -1;
-		var _cameraX2		= 1;
-		var _cameraY1		= 0;
-		var _cameraY2		= 0;
-		
 		var _viewPortX;
 		var _viewPortY;
 		
@@ -260,49 +255,11 @@ function Shinkansen (){
 		//----------------------------------------------
 		// INTERFACE
 		//----------------------------------------------
-		
-		this.getViewPortX = function () {return _viewPortX;}
-		this.setViewPortX = function (value) {
-			if(isNumber(value)){
-				_viewPortX = value;
-			}
-			return _viewPortX;
-		}
-		
-		this.getViewPortY = function () {return _viewPortY;}
-		this.setViewPortY = function (value) {
-			if(isNumber(value)){
-				_viewPortY = value;
-			}
-			return _viewPortY;
-		}
-		
-		this.addCallback = function (callback) {
-			if (_callbacksList.indexOf(callback) < 0) {
-				_callbacksList.push(callback);
-			}
-		}
-		
-		this.removeCallBack = function(callback) {
-			var index = _callbacksList.indexOf(callback);
-			if (index < 0) {
-				return;
-			}
-			_callbacksList.splice(index, 1);
-		}
-		
-		this.addNew = function(data, x, y, z){
-			var item = new Clip3D(data, x, y, z);
-			_self.add(item);
-			return item;
-		}
-
-		this.add = function(item) {
-			if(null == item){
-				throw new Error("Can not add a null item");
-			}
+		this.add = function(data, x, y, z, callback, context){
+			var item = new Clip3D(data, x, y, z, callback, context);
 			_itemsList.push(item);
 			emitEvent(Shinkansen.ADD, item);
+			return item;
 		}
 		
 		this.remove = function (item) {
@@ -314,29 +271,21 @@ function Shinkansen (){
 			_itemsList.splice(index, 1);
 			emitEvent(Shinkansen.REMOVE, item);
 		}
+
+		// Add listener
+        this.addEventListener = function (type, listener, context){
+            _emitter.addEventListener(type, listener, context);
+        }
+        
+        // Remove Listener
+        this.removeEventListener = function (type, listener, context){
+            _emitter.removeEventListener(type, listener, context);
+		}
 		
 		//----------------------------------------------
-		// Desplazamiento de camera
-		this.getOffsetY = function () {return _offsetY;}
-		this.setOffsetY = function (value) {
-			if(isNumber(value)){
-				_offsetY = value;
-			}
-			return _offsetY;
-		}
-		
-		this.getOffsetX = function () {return _offsetX;}
-		this.setOffsetX = function (value) {
-			if(isNumber(value)){
-				_offsetX = value;
-			}
-			return _offsetX;
-		}
-
-		this.debuger = {};
-		this.onDebug = function(){}
-
-		this.newRender = function() {
+		// Helpers
+		//----------------------------------------------
+		var render = function() {
 			var length = _itemsList.length;
 			if(0 == length){
 				// Early return
@@ -377,16 +326,16 @@ function Shinkansen (){
 
 			if(_self.rotation != _rotation){
 				if(isNumber(_self.rotation)){
-					_radian = toRadian(_self.rotation);
-					_rotation  = _self.rotation%360;
+					_rotation	= ((_self.rotation%360)+360)%360;
+					_radian		= _rotation * (PI2/360);
 				}else{
-					_self.rotation = _rotation%360;
+					_self.rotation = _rotation;
 				}
 			}
 			
 			if(_self.angular != _angular){
 				if(isNumber(_self.angular) ){
-					_angular = _self.angular;
+					_angular = ((_self.angular%360)+360)%360;
 				}else{
 					_self.angular = _angular;
 				}
@@ -415,11 +364,13 @@ function Shinkansen (){
 				
 				itemX		= item.x;
 				itemY		= item.z;
+
 				dx			= itemX - _cameraX;
 				dy			= itemY - _cameraZ;
-				radian		= Math.atan2(y, x);
+				radian		= Math.atan2(dy, dx);
 				angle		= radian * (360/PI2); 
 				angle   	= (angle+360)%360;
+				
 				max 		= _rotation + _angular;
 				min 		= _rotation - _angular;
 				isInRange	= angle <= max && angle >= min;
@@ -465,330 +416,49 @@ function Shinkansen (){
 			}
 			
 			emitEvent(Shinkansen.RENDER);
-
-			//////////////////////////////////////////////////////////////////////
-			/*
-			var test 		 = getRotatedPoint(1, 0,  _radian, _cameraX, _cameraZ);
-			_self.debuger.x  = _cameraX;
-			_self.debuger.y  = _cameraZ;
-			_self.debuger.x1 =  test.x;
-			_self.debuger.y2 =  test.y;
-			
-			var radian        = toRadian(toDegree(_radian) -_angular);
-			var test 		  = getRotatedPoint(1, 0,  radian, _cameraX, _cameraZ);
-			_self.debuger.hx  = _cameraX;
-			_self.debuger.hy  = _cameraZ;
-			_self.debuger.hx1 =  test.x;
-			_self.debuger.hy2 =  test.y;
-			
-			var radian        = toRadian(toDegree(_radian)+ _angular);
-			var test 		  = getRotatedPoint(1, 0,  radian, _cameraX, _cameraZ);
-			_self.debuger.mx  = _cameraX;
-			_self.debuger.my  = _cameraZ;
-			_self.debuger.mx1 =  test.x;
-			_self.debuger.my2 =  test.y;
-
-			var color;
-			var angle  	= rectRotation(item.x, item.z);
-			var max		= _rotation + _angular;
-			var min		= _rotation - _angular;
-
-			if(angle <= max && angle >= min){
-				color = "#00FF00";
-			}else{
-				color = "#FF0000";
-			}
-			
-			_self.debuger.color = color;
-			_self.debuger.cx  	= _cameraX;
-			_self.debuger.cy  	= _cameraZ;
-			_self.debuger.cx1 	= item.x;
-			_self.debuger.cy1 	= item.z;
-			_self.debuger.angle = angle;
-			_self.debuger.max 	= max;
-			_self.debuger.min 	= min;
-			_self.debuger.rot 	= _rotation;
-			*/
-		}
-
-		this.doRender = function() {
-			var length = _itemsList.length;
-			if(0 == length){
-				// Early return
-				return;
-			}
-			
-			updateProperties();
-			
-			var dx;
-			var dy;
-			var z;
-			var item;
-			var itemX;
-			var itemY;
-			var scaleFactor;
-			var isInRange
-			var index  = 0;
-			
-			while (index < length) {
-				item	= _itemsList[index];
-				item.updateProperties();
-
-				itemX	= item.x;
-				itemY	= item.z;
-				
-				isInRange		= checkIsInRange(itemX, itemY);
-				
-				if (!isInRange) {
-					item.visible = false;
-					item.scale   = 0;
-					index++;
-					continue;
-				}
-				
-				dx = itemX - _cameraX;
-				dy = itemY - _cameraZ;
-				
-				var itemRadian	= Math.atan2(dy,dx) + _radian;
-				var radius		= Math.sqrt(dx * dx + dy * dy);
-				scaleFactor		= _focalLength / (radius);
-				item.visible	= scaleFactor > 0 ;
-				
-				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
-				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
-				var renderZ = z;
-				var scale    = scaleFactor;
-				
-				item.renderX = renderX;
-				item.renderY = renderY;
-				item.render  = renderZ;
-				item.scale	 = scaleFactor;
-				
-				index++;
-			}
-			
-			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
-			_itemsList.sort(function(a, b){
-				if(a.scale == b.scale){
-					return 0;
-				}else if(a.scale < b.scale){
-					return -1;
-				}else if(a.scale > b.scale){
-					return 1;
-				}
-			});
-			
-			index = 0;
-			var callback;
-			var indexCallback	= 0;
-			var callbacksLenght	= _callbacksList.length;
-			var lastIndex		= length-1;
-			while (index < length) {
-				item = _itemsList[index];
-				indexCallback = 0;
-				while (indexCallback < callbacksLenght) {
-					callback = _callbacksList[indexCallback];
-					callback(item.data, 
-							 index, 
-							 item.renderX,
-							 item.renderY,
-							 item.renderZ,
-							 item.scale,
-							 item.visible);
-					indexCallback++
-				}
-				index++
-			}
-
-			emitEvent(Shinkansen.RENDER);
-		}
-
-		// Add listener
-        this.addEventListener = function (type, listener, context){
-            _emitter.addEventListener(type, listener, context);
-        }
-        
-        // Remove Listener
-        this.removeEventListener = function (type, listener, context){
-            _emitter.removeEventListener(type, listener, context);
 		}
 		
 		var emitEvent = function(type, data){
             _emitter.emit(type, data);
 		}
 
-		//----------------------------------------------
-		// Helpers
-		//----------------------------------------------
-		
-		var getHipotenuse  = function(dx, dy) {
-			var hypotenuse =  Math.sqrt(dx * dx + dy * dy);
-			return hypotenuse;
+		var update = function(){
+			_requestAnimationFrame(update);
+			render.apply();
 		}
-		
-		var toRadian  = function(degree){
-			return degree * (PI2/360);
-		}
-		
-		var toDegree  = function(radian) {
-			return radian * (360/PI2);
-		}
-		
-		var updateProperties  = function() {
-			if(_cameraX != _self.cameraX){
-				if(isNumber(_self.cameraX)){
-					_cameraX = _self.cameraX;
-				}else{
-					_self.cameraX = _cameraX;
-				}
-			}
+		_requestAnimationFrame(update);
 
-			if(_cameraY != _self.cameraY){
-				if(isNumber(_self.cameraY)){
-					_cameraY = _self.cameraY;
-				}else{
-					_self.cameraY = _cameraY;
-				}
+		//-------------------------------------------------
+		// Trigonometry
+		//-------------------------------------------------
+		/*
+			radian =  degree * (PI2/360);
+			degree =  radian * (360/PI2);
+		*/
+		var pointByRadian  = function(x, y, radian, offsetX, offsetY) {
+			if(!isNumber(x) && !isNumber(y) && !isNumber(radian)){
+				throw new Error("To get a rotated point, the arguments [ x, y, angle ] must be a Number.");
 			}
-
-			if(_cameraZ != _self.cameraZ){
-				if(isNumber(_self.cameraZ)){
-					_cameraZ = _self.cameraZ;
-				}else{
-					_self.cameraZ = _cameraZ;
-				}
-			}
-
-			if(_focalLength != _self.focalLength){
-				if(isNumber(_self.focalLength)){
-					_focalLength = _self.focalLength;
-				}else{
-					_self.focalLength = _focalLength;
-				}
-			}
-
-			if(_self.rotation != _rotation){
-				if(isNumber(_self.rotation)){
-					_radian = toRadian(_self.rotation);
-					_rotation  = _self.rotation%360;
-				}else{
-					_self.rotation = _rotation%360;
-				}
-			}
-
-			if(_self.angular != _angular){
-				if(isNumber(_self.angular) ){
-					_angular = _self.angular;
-				}else{
-					_self.angular = _angular;
-				}
-			}
-			
-			var halfViewPort	= _viewPortX / 2;
-			var visionLength	= getHipotenuse(halfViewPort, _focalLength);
-			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
-			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
-			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian, _cameraX, _cameraZ);
-
-			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
-			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);
-			
-			_visionRadian		= getVectorsRadian(leftPoint.x, leftPoint.y, _pointLength.x, _pointLength.y);
-			
-			_cameraX1 			= leftPoint.x; 
-			_cameraY1 			= leftPoint.y;
-			_cameraX2 			= rigthPoint.x;
-			_cameraY2 			= rigthPoint.y;
-			/*
-			_slope				= (_cameraY2 - _cameraY1) / (_cameraX2 - _cameraX1);
-			_interceptorY		= _cameraY1 - _slope * _cameraX1;*/
-		}
-		
-		var getRotatedPoint  = function(x, y, radian, originX, originY) {
-			originX		= getDefaultValue(originX, 0);
-			originY		= getDefaultValue(originY, 0);
-			
-			var finalX	= x * Math.cos(radian) - y * Math.sin(radian) + originX;
-			var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + originY;
+			offsetX		= isNumber(offsetX) ? offsetX : 0;
+			offsetY		= isNumber(offsetY) ? offsetY : 0;
+			var finalX	= x * Math.cos(radian) - y * Math.sin(radian) + offsetX;
+			var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + offsetY;
 			var point	= new Point(finalX, finalY);
 			return point;
 		}
 
-		var anglePoint = function(x, y, radian){
-
+		var pointByDegree  = function(x, y, degree, offsetX, offsetY) {
+			var radian = ((degree%360)+360)%360 * (PI2/360);
+			return pointByRadian(x, y, radian, offsetX, offsetY);
 		}
 
-		var rectRotation = function(x, y){
-			x = x - _cameraX;
-			y = y - _cameraZ;
-			var degree = Math.atan2(y, x) * (360/PI2); 
-			return (degree+360)%360;
-		}
-		
-		var checkIsInRange  = function(x, y) {
-			var radian = getVectorsRadian(_pointLength.x, _pointLength.y, x, y);
-			return _visionRadian > radian;
-		}
-		
-		var getVectorsRadian  = function(point1X, point1Y, point2X, point2Y ) {
-			point1X		-= _cameraX;
-			point1Y		-= _cameraZ;
-			
-			point2X		-= _cameraX;
-			point2Y		-= _cameraZ;
-			
-			var scalar	=  point1X * point2X + point1Y * point2Y;
-			var mod1	= getHipotenuse(point1X, point1Y);
-			var mod2	= getHipotenuse(point2X, point2Y);
-			var mods	= (mod1 * mod2); 
-			
-			var radianToCalculate = mods == 0 ? 0 : scalar / mods;
-			var radian= Math.acos(radianToCalculate);
-			if(isNaN(radian)){
-				return;
-			}
-			
-			while (isNaN(radian)) {
-				radian = Math.acos(int(radianToCalculate * 10) / 10);
-			}
-			return radian;
-		}
-		
-		var getPointDistance  = function(itemX, itemY, 
-										  x1, y1, x2, y2) {
-			var denominator = Math.abs((y2 - y1) * itemX - (x2 - x1) * itemY + x2 * y1 - y2 * x1);
-			var divisor     = Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 -x1, 2));
-			return denominator / divisor;
-			
-			// d = 	|A·Mx + B·My + C|
-			//			√A2 + B2		
-			//https://www.youtube.com/watch?v=bfZ57ESvFok
-		}
-		
-		var getPointIntersection  = function(itemX, itemY) {
-			var m2 = -(1 / _slope);
-			var b2  = itemY - m2 * itemX;
-			var x2  = (b2-_interceptorY)/(_slope-m2);
-			var y2  = (m2 * x2 + b2);
-			return new Point(x2, y2);
-		}
-		
-		var Point  = function(x, y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		var getDefaultValue = function(value, defaultValue) {
-			var finalValue = typeof(value) === "undefined" ? defaultValue : value;
-			return finalValue;
+		var pointByRadiusRadian = function(radius, radian, offsetX, offsetY){
+			return pointByRadian(radius, 0, radian, offsetX, offsetY);
 		}
 
-		var update = function(){
-			_requestAnimationFrame(update);
-			_self.doRender.apply(_self);
+		var pointByRadiusDegree = function(radius, degree){
+			return pointByDegree(radius, 0, radian, offsetX, offsetY);
 		}
-		_requestAnimationFrame(update);
 	}
 
 	Shinkansen.ADD			= "add";
