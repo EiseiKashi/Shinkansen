@@ -21,7 +21,10 @@ function Sankaku (){
         var hypotenuse =  Math.sqrt(dx * dx + dy * dy);
         return hypotenuse;
     }
-        
+    /*
+        radian =  degree * (PI2/360);
+        degree =  radian * (360/PI2);
+    */
     var getRadian  = function(degree){
         return (((degree%360)+360)%360) * (PI2/360);
     }
@@ -30,7 +33,7 @@ function Sankaku (){
         return radian * (360/PI2);
     }
     
-    var getRotatedPoint  = function(x, y, radian, offsetX, offsetY) {
+    var pointByRadian  = function(x, y, radian, offsetX, offsetY) {
         offsetX		= isNumber(offsetX) ? offsetX : 0;
         offsetY		= isNumber(offsetY) ? offsetY : 0;
         
@@ -38,6 +41,14 @@ function Sankaku (){
         var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + offsetY;
         var point	= new Point(finalX, finalY);
         return point;
+    }
+
+    var pointByLengthRadian = function(length, radian, offsetX, offsetY){
+        return pointByRadian(length, 0, radian, offsetX, offsetY);
+    }
+
+    var pointByLengthDegree = function(length, degree){
+        return pointByDegree(length, 0, radian, offsetX, offsetY);
     }
         
     var getLinesRadian  = function(line1, line2) {

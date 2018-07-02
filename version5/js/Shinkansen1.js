@@ -431,10 +431,6 @@ function Shinkansen (){
 		//-------------------------------------------------
 		// Trigonometry
 		//-------------------------------------------------
-		/*
-			radian =  degree * (PI2/360);
-			degree =  radian * (360/PI2);
-		*/
 		var pointByRadian  = function(x, y, radian, offsetX, offsetY) {
 			if(!isNumber(x) && !isNumber(y) && !isNumber(radian)){
 				throw new Error("To get a rotated point, the arguments [ x, y, angle ] must be a Number.");
@@ -450,14 +446,6 @@ function Shinkansen (){
 		var pointByDegree  = function(x, y, degree, offsetX, offsetY) {
 			var radian = ((degree%360)+360)%360 * (PI2/360);
 			return pointByRadian(x, y, radian, offsetX, offsetY);
-		}
-
-		var pointByRadiusRadian = function(radius, radian, offsetX, offsetY){
-			return pointByRadian(radius, 0, radian, offsetX, offsetY);
-		}
-
-		var pointByRadiusDegree = function(radius, degree){
-			return pointByDegree(radius, 0, radian, offsetX, offsetY);
 		}
 	}
 

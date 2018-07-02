@@ -51,7 +51,6 @@ var totalColumns = 5;
 var totalRows = 2;
 
 function onDraging(){
-	clearInterval(intervalId);
 	if(shinkansen){
 		shinkansen.cameraX = cameraIcon.x;
 		shinkansen.cameraZ = cameraIcon.y;
@@ -64,10 +63,22 @@ var cameraIcon;
 function init(){
 	canvateWorld = new CanvateWorld (totalColumns, totalRows, _size);
 	cameraIcon.setScale(0.1, 0.1);
-	//cameraIcon.setPivot(.56, .5);
-	//cameraIcon.setPosition(200, 75);
+	cameraIcon.setPivot(0, .5);
 	cameraIcon.startDrag();
 	cameraIcon.addEventListener("draging", onDraging);
 }
+
+function onKeyDown(event){
+	var code = event.keyCode;
+	if(38){
+		shinkansen.rotation += 1;	
+	}
+
+	if(40){
+		shinkansen.rotation -= 1;
+	}
+}
+
+this.addEventListener("keydown", onKeyDown);
 
 setTimeout(init, 2000);
