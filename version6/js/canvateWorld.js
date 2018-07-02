@@ -52,9 +52,10 @@ var totalRows = 2;
 
 function onDraging(){
 	clearInterval(intervalId);
+
 	if(shinkansen){
-		shinkansen.cameraX = cameraIcon.x;
-		shinkansen.cameraZ = cameraIcon.y;
+		shinkansen.cameraX 	= cameraIcon.x;
+		shinkansen.cameraZ 	= cameraIcon.y;
 	}
 };
 

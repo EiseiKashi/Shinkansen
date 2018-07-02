@@ -8,9 +8,9 @@ shinkansen.setOffsetY   (viewPort/3);
 		
 var node;
 var item;
-
-var _size			= 60;
-var fracc			= 60;
+		
+var _size			= 120;
+var fracc			= 120;
 var totalColumns	= 5;
 var totalRows    	= 2;
 var yPostion		= 0;
@@ -20,7 +20,6 @@ var indexX			= 1;
 var index			= 0;
 var x;
 var y;
-var clip3DList = [];
 while (rowIndex < totalRows) {
 	columnIndex = 0;
 	while(columnIndex < totalColumns) {
@@ -28,7 +27,6 @@ while (rowIndex < totalRows) {
 		x		= columnIndex*_size;
 		y		= rowIndex*_size;
 		item	= shinkansen.addNew(node, x, 0, y);
-		clip3DList.push(item);
 		index++
 		columnIndex ++;
 	}
@@ -42,72 +40,16 @@ shinkansen.cameraZ = 30;
 var camera = 0;
 
 shinkansen.addCallback(onRender);
-shinkansen.rotation = 180;
+shinkansen.rotation = 0;
 
-setTimeout(rotate, 500);
-
-var index = 0;
-
-function rotate(){
+var intervalId /*= setInterval(function(){
 	shinkansen.rotation +=10;
-	index = 0;
-	showClip();
-}
-
-function drawLine (x, y, x1, y1, color){
-	map.beginPath();
-	map.moveTo(x, y);
-	map.lineTo(x1, y1);
-	map.strokeStyle = color;
-	map.stroke();
-}
-
-function showClip(){
-	var clip = clip3DList[index];
-	index++;
-
-	mapCanvas.width  = mapCanvas.width;
-	mapCanvas.height = mapCanvas.height;
-	
-	shinkansen.getRenderByItem(clip);
-
-	var debuger = shinkansen.debuger;
-
-	drawLine(	 debuger.x
-				,debuger.y
-				,debuger.x1
-				,debuger.y2
-				,'#0000FF');
-
-	drawLine(	 debuger.hx
-				,debuger.hy
-				,debuger.hx1
-				,debuger.hy2
-				,'#00FFFF');
-
-	drawLine(	 debuger.mx
-				,debuger.my
-				,debuger.mx1
-				,debuger.my2
-				,'#00FFFF');
-
-	drawLine(	 debuger.cx
-				,debuger.cy
-				,debuger.cx1
-				,debuger.cy1
-				,debuger.color);
-
-	console.log( debuger.min + " |  " + debuger.angle + " |  " + debuger.max + 
-				 " => " + debuger.rot);
-	
-	var callback = rotate;
-	if(index < clip3DList.length){
-		callback = showClip;	
+	camera -= 1;
+	if(camera < 0){
+		camera = 570;
 	}
-
-	setTimeout(callback, 2000);
-}
-
+}, 500);*/
+	
 function onRender(view, index, x, y, z, scale, visible) {
 	view.style.display = visible ? "inline" : "none";
 	view.style.left    = x + "px";
@@ -115,6 +57,40 @@ function onRender(view, index, x, y, z, scale, visible) {
 	view.style.width   = (scale*99) + "px";
 	view.style.height  = (scale*99) + "px";
 	view.style.zIndex  = index;
+
+
+
+	mapCanvas.width  = mapCanvas.width;
+	mapCanvas.height = mapCanvas.height;
+	var x  = shinkansen.debuger.x;
+	var y  = shinkansen.debuger.y;
+	var x1 = shinkansen.debuger.x1;
+	var y1 = shinkansen.debuger.y2;
+	map.beginPath();
+	map.moveTo(x, y);
+	map.lineTo(x1, y1);
+	map.strokeStyle = '#0000FF';
+	map.stroke();
+
+	var x  = shinkansen.debuger.hx;
+	var y  = shinkansen.debuger.hy;
+	var x1 = shinkansen.debuger.hx1;
+	var y1 = shinkansen.debuger.hy2;
+	map.beginPath();
+	map.moveTo(x, y);
+	map.lineTo(x1, y1);
+	map.strokeStyle = '#FF0000';
+	map.stroke();
+
+	var x  = shinkansen.debuger.mx;
+	var y  = shinkansen.debuger.my;
+	var x1 = shinkansen.debuger.mx1;
+	var y1 = shinkansen.debuger.my2;
+	map.beginPath();
+	map.moveTo(x, y);
+	map.lineTo(x1, y1);
+	map.strokeStyle = '#00FF00';
+	map.stroke();
 }
 
 var mapCanvas = document.getElementById("cameraMap");
