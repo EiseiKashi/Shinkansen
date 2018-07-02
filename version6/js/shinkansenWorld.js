@@ -121,3 +121,7 @@ var mapCanvas = document.getElementById("cameraMap");
 var map = mapCanvas.getContext("2d");
 mapCanvas.width = 600;
 mapCanvas.height = 200;
+
+
+
+

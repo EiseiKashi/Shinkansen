@@ -1,0 +1,39 @@
+body {
+	background-color: black;
+}
+
+.container {
+	overflow:hidden;
+	width:500px;
+	height:500px;
+	position: relative;
+}
+
+img {
+	display:inline;
+	position:absolute;
+	float:left;
+	width:30px;
+	height:30px;
+}
+
+.row {
+	width:100%;
+}
+
+.row::after{
+	content:" ";
+	clear: both;
+	opacity: 0;
+}
+
+.column6 {
+	float:left;
+	width:50%;
+	overflow: hidden;
+}
+
+.column12 {
+	width:100%;
+	overflow: hidden;
+}

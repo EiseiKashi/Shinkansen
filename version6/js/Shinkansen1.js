@@ -147,7 +147,7 @@ function Shinkansen (){
 	}
 	
 	var clipIdCounter = 0;
-	var Clip3D = function (view, x, y, z, callback, context) {
+	var Clip3D = function (view, x, y, z) {
 		'use strict';
 
 		var _id		= clipIdCounter;
@@ -163,12 +163,6 @@ function Shinkansen (){
 		this.x		= x;
 		this.y		= y;
 		this.z		= z;
-
-		this.renderX;
-		this.renderY;
-		this.renderZ;
-		this.scale;
-		this.visible;
 
 		this.view	= view;
 
@@ -197,10 +191,6 @@ function Shinkansen (){
 				}
 			}
 		}
-
-		this.setRender = function(x, y, z, scale, visible){
-			callback.apply(context, [this])
-		}
 	}
 
 	var Shinkansen = function() {
@@ -212,12 +202,14 @@ function Shinkansen (){
 		this.cameraZ;
 		this.focalLength;
 		this.rotation;
+		this.angular;
 		
 		var _cameraX		= 0;
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
 		var _focalLength	= 300;
 		var _rotation;
+		var _angular        = 30;
 		
 		var _emitter		= new Emitter(this);
 		
@@ -321,8 +313,176 @@ function Shinkansen (){
 		}
 
 		this.debuger = {};
-		this.onDebug = function(){
+		this.onDebug = function(){}
 
+		this.newRender = function() {
+			var length = _itemsList.length;
+			if(0 == length){
+				// Early return
+				return;
+			}
+
+			if(_cameraX != _self.cameraX){
+				if(isNumber(_self.cameraX)){
+					_cameraX = _self.cameraX;
+				}else{
+					_self.cameraX = _cameraX;
+				}
+			}
+
+			if(_cameraY != _self.cameraY){
+				if(isNumber(_self.cameraY)){
+					_cameraY = _self.cameraY;
+				}else{
+					_self.cameraY = _cameraY;
+				}
+			}
+
+			if(_cameraZ != _self.cameraZ){
+				if(isNumber(_self.cameraZ)){
+					_cameraZ = _self.cameraZ;
+				}else{
+					_self.cameraZ = _cameraZ;
+				}
+			}
+
+			if(_focalLength != _self.focalLength){
+				if(isNumber(_self.focalLength)){
+					_focalLength = _self.focalLength;
+				}else{
+					_self.focalLength = _focalLength;
+				}
+			}
+
+			if(_self.rotation != _rotation){
+				if(isNumber(_self.rotation)){
+					_radian = toRadian(_self.rotation);
+					_rotation  = _self.rotation%360;
+				}else{
+					_self.rotation = _rotation%360;
+				}
+			}
+			
+			if(_self.angular != _angular){
+				if(isNumber(_self.angular) ){
+					_angular = _self.angular;
+				}else{
+					_self.angular = _angular;
+				}
+			}
+			
+			var dx;
+			var dy;
+			var z;
+			var item;
+			var itemX;
+			var itemY;
+			var scaleFactor;
+			var radian;
+			var angle;
+			var isInRange;
+			var max;
+			var min;
+			var radius;
+			var renderX;
+			var renderY;
+			var renderZ;
+			var index  = 0;
+			
+			while (index < length) {
+				item		= _itemsList[index];
+				item.updateProperties();
+				
+				itemX		= item.x;
+				itemY		= item.z;
+				dx			= itemX - _cameraX;
+				dy			= itemY - _cameraZ;
+				radian		= Math.atan2(y, x);
+				angle		= radian * (360/PI2); 
+				angle   	= (angle+360)%360;
+				max 		= _rotation + _angular;
+				min 		= _rotation - _angular;
+				isInRange	= angle <= max && angle >= min;
+				
+				if (!isInRange) {
+					item.visible = false;
+					item.scale   = 0;
+					index++;
+					continue;
+				}
+				
+				radius			= Math.sqrt(dx * dx + dy * dy);
+				scaleFactor		= _focalLength / radius;
+				item.visible	= scaleFactor > 0 ;
+				
+				renderX			= (Math.cos(radian) * radius * scaleFactor);
+				renderY 		= ((item.y - _cameraY) * scaleFactor);
+				renderZ 		= scaleFactor;
+				
+				item.renderX 	= renderX;
+				item.renderY 	= renderY;
+				item.render  	= renderZ;
+				item.scale	 	= scaleFactor;
+				
+				index++;
+			}
+			
+			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
+			_itemsList.sort(function(a, b){
+				if(a.scale == b.scale){
+					return 0;
+				}else if(a.scale < b.scale){
+					return -1;
+				}else if(a.scale > b.scale){
+					return 1;
+				}
+			});
+			
+			emitEvent(Shinkansen.RENDER);
+
+			//////////////////////////////////////////////////////////////////////
+			/*
+			var test 		 = getRotatedPoint(1, 0,  _radian, _cameraX, _cameraZ);
+			_self.debuger.x  = _cameraX;
+			_self.debuger.y  = _cameraZ;
+			_self.debuger.x1 =  test.x;
+			_self.debuger.y2 =  test.y;
+			
+			var radian        = toRadian(toDegree(_radian) -_angular);
+			var test 		  = getRotatedPoint(1, 0,  radian, _cameraX, _cameraZ);
+			_self.debuger.hx  = _cameraX;
+			_self.debuger.hy  = _cameraZ;
+			_self.debuger.hx1 =  test.x;
+			_self.debuger.hy2 =  test.y;
+			
+			var radian        = toRadian(toDegree(_radian)+ _angular);
+			var test 		  = getRotatedPoint(1, 0,  radian, _cameraX, _cameraZ);
+			_self.debuger.mx  = _cameraX;
+			_self.debuger.my  = _cameraZ;
+			_self.debuger.mx1 =  test.x;
+			_self.debuger.my2 =  test.y;
+
+			var color;
+			var angle  	= rectRotation(item.x, item.z);
+			var max		= _rotation + _angular;
+			var min		= _rotation - _angular;
+
+			if(angle <= max && angle >= min){
+				color = "#00FF00";
+			}else{
+				color = "#FF0000";
+			}
+			
+			_self.debuger.color = color;
+			_self.debuger.cx  	= _cameraX;
+			_self.debuger.cy  	= _cameraZ;
+			_self.debuger.cx1 	= item.x;
+			_self.debuger.cy1 	= item.z;
+			_self.debuger.angle = angle;
+			_self.debuger.max 	= max;
+			_self.debuger.min 	= min;
+			_self.debuger.rot 	= _rotation;
+			*/
 		}
 
 		this.doRender = function() {
@@ -341,8 +501,6 @@ function Shinkansen (){
 			var itemX;
 			var itemY;
 			var scaleFactor;
-			var name;
-			var viewName;
 			var isInRange
 			var index  = 0;
 			
@@ -366,20 +524,18 @@ function Shinkansen (){
 				dy = itemY - _cameraZ;
 				
 				var itemRadian	= Math.atan2(dy,dx) + _radian;
-				var radius		= getHipotenuse(dx, dy);
-				z				= getPointDistance(	itemX, itemY,
-													_cameraX1, _cameraY1,
-													_cameraX2, _cameraY2);
-				scaleFactor		= _focalLength / (z);
+				var radius		= Math.sqrt(dx * dx + dy * dy);
+				scaleFactor		= _focalLength / (radius);
 				item.visible	= scaleFactor > 0 ;
 				
 				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
 				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
-				var renderZ = radius;
+				var renderZ = z;
+				var scale    = scaleFactor;
 				
 				item.renderX = renderX;
 				item.renderY = renderY;
-				item.renderZ = renderZ;
+				item.render  = renderZ;
 				item.scale	 = scaleFactor;
 				
 				index++;
@@ -444,11 +600,11 @@ function Shinkansen (){
 			return hypotenuse;
 		}
 		
-		var getRadianFromRotation  = function(degree){
+		var toRadian  = function(degree){
 			return degree * (PI2/360);
 		}
 		
-		var getRotationFromRadian  = function(radian) {
+		var toDegree  = function(radian) {
 			return radian * (360/PI2);
 		}
 		
@@ -485,11 +641,20 @@ function Shinkansen (){
 				}
 			}
 
-			if(isNumber(_self.rotation) && _self.rotation != _rotation){
-				var radian = getRadianFromRotation(_self.rotation);
-				if(isNumber(radian)){
-					_radian = radian;
-					_rotation  = getRotationFromRadian(radian);
+			if(_self.rotation != _rotation){
+				if(isNumber(_self.rotation)){
+					_radian = toRadian(_self.rotation);
+					_rotation  = _self.rotation%360;
+				}else{
+					_self.rotation = _rotation%360;
+				}
+			}
+
+			if(_self.angular != _angular){
+				if(isNumber(_self.angular) ){
+					_angular = _self.angular;
+				}else{
+					_self.angular = _angular;
 				}
 			}
 			
@@ -498,12 +663,7 @@ function Shinkansen (){
 			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
 			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
 			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian,     _cameraX, _cameraZ);
-
-			_self.debuger.x  = _cameraX;
-			_self.debuger.y  = _cameraZ;
-			_self.debuger.x1 = _pointLength.x;
-			_self.debuger.y2 = _pointLength.y;
+			_pointLength		= getRotatedPoint(0, _focalLength,  _radian, _cameraX, _cameraZ);
 
 			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
 			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);
@@ -527,6 +687,17 @@ function Shinkansen (){
 			var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + originY;
 			var point	= new Point(finalX, finalY);
 			return point;
+		}
+
+		var anglePoint = function(x, y, radian){
+
+		}
+
+		var rectRotation = function(x, y){
+			x = x - _cameraX;
+			y = y - _cameraZ;
+			var degree = Math.atan2(y, x) * (360/PI2); 
+			return (degree+360)%360;
 		}
 		
 		var checkIsInRange  = function(x, y) {

@@ -1,6 +1,6 @@
 /*
 	Version 0.0.1
-	# Remove Viewport
+	# New render
 */
 
 var version = 10;
@@ -150,6 +150,7 @@ function Shinkansen (){
 	var Clip3D = function (view, x, y, z, callback, context) {
 		'use strict';
 
+		var _self   = this;
 		var _id		= clipIdCounter;
 		this.getId	= function() {
 			return _id;
@@ -160,17 +161,19 @@ function Shinkansen (){
 		var _y;
 		var _z;
 
-		this.x		= x;
-		this.y		= y;
-		this.z		= z;
+		this.x			= x;
+		this.y			= y;
+		this.z			= z;
+		this.view		= view;
+		this.callback	= callback;
+		this.context	= context;
 
 		this.renderX;
 		this.renderY;
 		this.renderZ;
 		this.scale;
 		this.visible;
-
-		this.view	= view;
+		this.depth;
 
 		this.updateProperties = function(){
 			if(_x != this.x){
@@ -197,9 +200,9 @@ function Shinkansen (){
 				}
 			}
 		}
-
-		this.setRender = function(x, y, z, scale, visible){
-			callback.apply(context, [this])
+		
+		this.emit = function(){
+			this.callback.apply(this.context, [this]);
 		}
 	}
 
@@ -212,12 +215,14 @@ function Shinkansen (){
 		this.cameraZ;
 		this.focalLength;
 		this.rotation;
+		this.angular;
 		
 		var _cameraX		= 0;
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
 		var _focalLength	= 300;
-		var _rotation;
+		var _rotation		= 0;
+		var _angular        = 30;
 		
 		var _emitter		= new Emitter(this);
 		
@@ -231,11 +236,6 @@ function Shinkansen (){
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 		
-		var _cameraX1		= -1;
-		var _cameraX2		= 1;
-		var _cameraY1		= 0;
-		var _cameraY2		= 0;
-		
 		var _viewPortX;
 		var _viewPortY;
 		
@@ -247,49 +247,11 @@ function Shinkansen (){
 		//----------------------------------------------
 		// INTERFACE
 		//----------------------------------------------
-		
-		this.getViewPortX = function () {return _viewPortX;}
-		this.setViewPortX = function (value) {
-			if(isNumber(value)){
-				_viewPortX = value;
-			}
-			return _viewPortX;
-		}
-		
-		this.getViewPortY = function () {return _viewPortY;}
-		this.setViewPortY = function (value) {
-			if(isNumber(value)){
-				_viewPortY = value;
-			}
-			return _viewPortY;
-		}
-		
-		this.addCallback = function (callback) {
-			if (_callbacksList.indexOf(callback) < 0) {
-				_callbacksList.push(callback);
-			}
-		}
-		
-		this.removeCallBack = function(callback) {
-			var index = _callbacksList.indexOf(callback);
-			if (index < 0) {
-				return;
-			}
-			_callbacksList.splice(index, 1);
-		}
-		
-		this.addNew = function(data, x, y, z){
-			var item = new Clip3D(data, x, y, z);
-			_self.add(item);
-			return item;
-		}
-
-		this.add = function(item) {
-			if(null == item){
-				throw new Error("Can not add a null item");
-			}
+		this.add = function(data, x, y, z, callback, context){
+			var item = new Clip3D(data, x, y, z, callback, context);
 			_itemsList.push(item);
 			emitEvent(Shinkansen.ADD, item);
+			return item;
 		}
 		
 		this.remove = function (item) {
@@ -300,125 +262,6 @@ function Shinkansen (){
 			}
 			_itemsList.splice(index, 1);
 			emitEvent(Shinkansen.REMOVE, item);
-		}
-		
-		//----------------------------------------------
-		// Desplazamiento de camera
-		this.getOffsetY = function () {return _offsetY;}
-		this.setOffsetY = function (value) {
-			if(isNumber(value)){
-				_offsetY = value;
-			}
-			return _offsetY;
-		}
-		
-		this.getOffsetX = function () {return _offsetX;}
-		this.setOffsetX = function (value) {
-			if(isNumber(value)){
-				_offsetX = value;
-			}
-			return _offsetX;
-		}
-
-		this.debuger = {};
-		this.onDebug = function(){
-
-		}
-
-		this.doRender = function() {
-			var length = _itemsList.length;
-			if(0 == length){
-				// Early return
-				return;
-			}
-			
-			updateProperties();
-			
-			var dx;
-			var dy;
-			var z;
-			var item;
-			var itemX;
-			var itemY;
-			var scaleFactor;
-			var name;
-			var viewName;
-			var isInRange
-			var index  = 0;
-			
-			while (index < length) {
-				item	= _itemsList[index];
-				item.updateProperties();
-
-				itemX	= item.x;
-				itemY	= item.z;
-				
-				isInRange		= checkIsInRange(itemX, itemY);
-				
-				if (!isInRange) {
-					item.visible = false;
-					item.scale   = 0;
-					index++;
-					continue;
-				}
-				
-				dx = itemX - _cameraX;
-				dy = itemY - _cameraZ;
-				
-				var itemRadian	= Math.atan2(dy,dx) + _radian;
-				var radius		= getHipotenuse(dx, dy);
-				z				= getPointDistance(	itemX, itemY,
-													_cameraX1, _cameraY1,
-													_cameraX2, _cameraY2);
-				scaleFactor		= _focalLength / (z);
-				item.visible	= scaleFactor > 0 ;
-				
-				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
-				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
-				var renderZ = radius;
-				
-				item.renderX = renderX;
-				item.renderY = renderY;
-				item.renderZ = renderZ;
-				item.scale	 = scaleFactor;
-				
-				index++;
-			}
-			
-			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
-			_itemsList.sort(function(a, b){
-				if(a.scale == b.scale){
-					return 0;
-				}else if(a.scale < b.scale){
-					return -1;
-				}else if(a.scale > b.scale){
-					return 1;
-				}
-			});
-			
-			index = 0;
-			var callback;
-			var indexCallback	= 0;
-			var callbacksLenght	= _callbacksList.length;
-			var lastIndex		= length-1;
-			while (index < length) {
-				item = _itemsList[index];
-				indexCallback = 0;
-				while (indexCallback < callbacksLenght) {
-					callback = _callbacksList[indexCallback];
-					callback(item.data, 
-							 index, 
-							 item.renderX,
-							 item.renderY,
-							 item.renderZ,
-							 item.scale,
-							 item.visible);
-					indexCallback++
-				}
-				index++
-			}
-
-			emitEvent(Shinkansen.RENDER);
 		}
 
 		// Add listener
@@ -431,28 +274,16 @@ function Shinkansen (){
             _emitter.removeEventListener(type, listener, context);
 		}
 		
-		var emitEvent = function(type, data){
-            _emitter.emit(type, data);
-		}
-
 		//----------------------------------------------
 		// Helpers
 		//----------------------------------------------
-		
-		var getHipotenuse  = function(dx, dy) {
-			var hypotenuse =  Math.sqrt(dx * dx + dy * dy);
-			return hypotenuse;
-		}
-		
-		var getRadianFromRotation  = function(degree){
-			return degree * (PI2/360);
-		}
-		
-		var getRotationFromRadian  = function(radian) {
-			return radian * (360/PI2);
-		}
-		
-		var updateProperties  = function() {
+		var render = function() {
+			var length = _itemsList.length;
+			if(0 == length){
+				// Early return
+				return;
+			}
+
 			if(_cameraX != _self.cameraX){
 				if(isNumber(_self.cameraX)){
 					_cameraX = _self.cameraX;
@@ -485,113 +316,130 @@ function Shinkansen (){
 				}
 			}
 
-			if(isNumber(_self.rotation) && _self.rotation != _rotation){
-				var radian = getRadianFromRotation(_self.rotation);
-				if(isNumber(radian)){
-					_radian = radian;
-					_rotation  = getRotationFromRadian(radian);
+			if(_self.rotation != _rotation){
+				if(isNumber(_self.rotation)){
+					_rotation	= ((_self.rotation%360)+360)%360;
+					_radian		= _rotation * (PI2/360);
+				}else{
+					_self.rotation = _rotation;
 				}
 			}
 			
-			var halfViewPort	= _viewPortX / 2;
-			var visionLength	= getHipotenuse(halfViewPort, _focalLength);
-			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
-			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
-			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian,     _cameraX, _cameraZ);
-
-			_self.debuger.x  = _cameraX;
-			_self.debuger.y  = _cameraZ;
-			_self.debuger.x1 = _pointLength.x;
-			_self.debuger.y2 = _pointLength.y;
-
-			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
-			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);
-			
-			_visionRadian		= getVectorsRadian(leftPoint.x, leftPoint.y, _pointLength.x, _pointLength.y);
-			
-			_cameraX1 			= leftPoint.x; 
-			_cameraY1 			= leftPoint.y;
-			_cameraX2 			= rigthPoint.x;
-			_cameraY2 			= rigthPoint.y;
-			/*
-			_slope				= (_cameraY2 - _cameraY1) / (_cameraX2 - _cameraX1);
-			_interceptorY		= _cameraY1 - _slope * _cameraX1;*/
-		}
-		
-		var getRotatedPoint  = function(x, y, radian, originX, originY) {
-			originX		= getDefaultValue(originX, 0);
-			originY		= getDefaultValue(originY, 0);
-			
-			var finalX	= x * Math.cos(radian) - y * Math.sin(radian) + originX;
-			var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + originY;
-			var point	= new Point(finalX, finalY);
-			return point;
-		}
-		
-		var checkIsInRange  = function(x, y) {
-			var radian = getVectorsRadian(_pointLength.x, _pointLength.y, x, y);
-			return _visionRadian > radian;
-		}
-		
-		var getVectorsRadian  = function(point1X, point1Y, point2X, point2Y ) {
-			point1X		-= _cameraX;
-			point1Y		-= _cameraZ;
-			
-			point2X		-= _cameraX;
-			point2Y		-= _cameraZ;
-			
-			var scalar	=  point1X * point2X + point1Y * point2Y;
-			var mod1	= getHipotenuse(point1X, point1Y);
-			var mod2	= getHipotenuse(point2X, point2Y);
-			var mods	= (mod1 * mod2); 
-			
-			var radianToCalculate = mods == 0 ? 0 : scalar / mods;
-			var radian= Math.acos(radianToCalculate);
-			if(isNaN(radian)){
-				return;
+			if(_self.angular != _angular){
+				if(isNumber(_self.angular) ){
+					_angular = ((_self.angular%360)+360)%360;
+				}else{
+					_self.angular = _angular;
+				}
 			}
 			
-			while (isNaN(radian)) {
-				radian = Math.acos(int(radianToCalculate * 10) / 10);
+			var dx;
+			var dy;
+			var item;
+			var itemX;
+			var itemY;
+			var scaleFactor;
+			var radian;
+			var angle;
+			var isInRange;
+			var max;
+			var min;
+			var radius;
+			var renderX;
+			var renderY;
+			var renderZ;
+			var index  = 0;
+			var length = _itemsList.length;
+			for (var index=0; index < length; index++) {
+				item		= _itemsList[index];
+				item.updateProperties();
+				
+				itemX		= item.x;
+				itemY		= item.z;
+
+				dx			= itemX - _cameraX;
+				dy			= itemY - _cameraZ;
+				radian		= Math.atan2(dy, dx);
+				angle		= radian * (360/PI2); 
+				angle   	= (angle+360)%360;
+				
+				max 		= _rotation + _angular;
+				min 		= _rotation - _angular;
+				isInRange	= angle <= max && angle >= min;
+				
+				if (!isInRange) {
+					item.visible = false;
+					item.scale   = 0;
+					index++;
+					continue;
+				}
+				
+				radius			= Math.sqrt(dx * dx + dy * dy);
+				scaleFactor		= _focalLength / radius;
+				item.visible	= scaleFactor > 0 ;
+				
+				renderX			= (Math.cos(radian) * radius * scaleFactor);
+				renderY 		= ((item.y - _cameraY) * scaleFactor);
+				renderZ 		= scaleFactor;
+				
+				item.renderX 	= renderX;
+				item.renderY 	= renderY;
+				item.render  	= renderZ;
+				item.scale	 	= scaleFactor;
+
+				index++;
 			}
-			return radian;
-		}
-		
-		var getPointDistance  = function(itemX, itemY, 
-										  x1, y1, x2, y2) {
-			var denominator = Math.abs((y2 - y1) * itemX - (x2 - x1) * itemY + x2 * y1 - y2 * x1);
-			var divisor     = Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 -x1, 2));
-			return denominator / divisor;
 			
-			// d = 	|A·Mx + B·My + C|
-			//			√A2 + B2		
-			//https://www.youtube.com/watch?v=bfZ57ESvFok
+			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
+			_itemsList.sort(function(a, b){
+				if(a.scale == b.scale){
+					return 0;
+				}else if(a.scale < b.scale){
+					return -1;
+				}else if(a.scale > b.scale){
+					return 1;
+				}
+			});
+
+			var length = _itemsList.length;
+			for (var index=0; index < length; index++) {
+				item		= _itemsList[index];
+				item.depth	= index;
+				item.emit.apply(item);
+			}
+			
+			emitEvent(Shinkansen.RENDER);
 		}
 		
-		var getPointIntersection  = function(itemX, itemY) {
-			var m2 = -(1 / _slope);
-			var b2  = itemY - m2 * itemX;
-			var x2  = (b2-_interceptorY)/(_slope-m2);
-			var y2  = (m2 * x2 + b2);
-			return new Point(x2, y2);
-		}
-		
-		var Point  = function(x, y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		var getDefaultValue = function(value, defaultValue) {
-			var finalValue = typeof(value) === "undefined" ? defaultValue : value;
-			return finalValue;
+		var emitEvent = function(type, data){
+            _emitter.emit(type, data);
 		}
 
 		var update = function(){
 			_requestAnimationFrame(update);
-			_self.doRender.apply(_self);
+			render.apply();
 		}
 		_requestAnimationFrame(update);
+
+		//-------------------------------------------------
+		// Trigonometry
+		//-------------------------------------------------
+		var pointByRadian  = function(x, y, radian, offsetX, offsetY) {
+			if(!isNumber(x) && !isNumber(y) && !isNumber(radian)){
+				throw new Error("To get a rotated point, the arguments [ x, y, angle ] must be a Number.");
+			}
+			offsetX		= isNumber(offsetX) ? offsetX : 0;
+			offsetY		= isNumber(offsetY) ? offsetY : 0;
+			var finalX	= x * Math.cos(radian) - y * Math.sin(radian) + offsetX;
+			var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + offsetY;
+			var point	= new Point(finalX, finalY);
+			return point;
+		}
+
+		var pointByDegree  = function(x, y, degree, offsetX, offsetY) {
+			var radian = ((degree%360)+360)%360 * (PI2/360);
+			return pointByRadian(x, y, radian, offsetX, offsetY);
+		}
 	}
 
 	Shinkansen.ADD			= "add";
