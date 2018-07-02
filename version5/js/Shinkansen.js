@@ -200,17 +200,7 @@ function Shinkansen (){
 				}
 			}
 		}
-
-		this.setRender = function(x, y, z, scale, visible, depth){
-			this.renderX = x;
-			this.renderY = y;
-			this.renderZ = z;
-			this.scale	 = scale;
-			this.visible = visible;
-			this.depth   = depth;
-			this.view	= view;
-		}
-
+		
 		this.emit = function(){
 			this.callback.apply(this.context, [this]);
 		}
@@ -361,7 +351,6 @@ function Shinkansen (){
 			var index  = 0;
 			var length = _itemsList.length;
 			for (var index=0; index < length; index++) {
-				debugger;
 				item		= _itemsList[index];
 				item.updateProperties();
 				
@@ -414,7 +403,8 @@ function Shinkansen (){
 
 			var length = _itemsList.length;
 			for (var index=0; index < length; index++) {
-				item = _itemsList[index];
+				item		= _itemsList[index];
+				item.depth	= index;
 				item.emit.apply(item);
 			}
 			

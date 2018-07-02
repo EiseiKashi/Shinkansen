@@ -16,7 +16,7 @@ var index			= 0;
 var x;
 var y;
 var clip3DList = [];
-/*
+
 while (rowIndex < totalRows) {
 	columnIndex = 0;
 	while(columnIndex < totalColumns) {
@@ -30,13 +30,14 @@ while (rowIndex < totalRows) {
 	}
 	rowIndex++;
 }
-*/
-node	= document.getElementById("imagen" + 6);
-x		= 200;
-y		= 70;
+
+/*
+node	= document.getElementById("imagen" + 0);
+x		= 0;
+y		= 0;
 item	= shinkansen.add(node, x, 0, y, onRender, this);
 clip3DList.push(item);
-
+*/
 function drawLine (x, y, x1, y1, color){
 	map.beginPath();
 	map.moveTo(x, y);
@@ -52,18 +53,17 @@ function onRender(clip) {
     var scale   = clip.scale;
     var visible = clip.visible;
 	var index   = clip.depth;
-	
+	/*
 	var li = document.getElementById(view.id+"D");
-	var item = "<p>"+x+"</p><p>"+y+"</p><p>"+scale+"</p><p>"+visible+"</p><p>"+index+"</p>";
+	var item = "<p>x: "+x+"</p><p>y: "+y+"</p><p>scale: "+scale+"</p><p>visible: "+visible+"</p><p>index: "+index+"</p>";
 	li.innerHTML = item;
+	*/
 	view.style.display = visible ? "inline" : "none";
 	view.style.left    = x + "px";
 	view.style.top     = y + "px";
 	view.style.width   = (scale*99) + "px";
 	view.style.height  = (scale*99) + "px";
 	view.style.zIndex  = index;
-
-
 }
 
 var mapCanvas = document.getElementById("cameraMap");

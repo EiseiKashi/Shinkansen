@@ -150,6 +150,7 @@ function Shinkansen (){
 	var Clip3D = function (view, x, y, z, callback, context) {
 		'use strict';
 
+		var _self   = this;
 		var _id		= clipIdCounter;
 		this.getId	= function() {
 			return _id;
@@ -199,18 +200,9 @@ function Shinkansen (){
 				}
 			}
 		}
-
-		this.setRender = function(x, y, z, scale, visible, depth){
-			this.renderX = x;
-			this.renderY = y;
-			this.renderZ = z;
-			this.scale	 = scale;
-			this.visible = visible;
-			this.depth   = depth;
-		}
-
+		
 		this.emit = function(){
-			this.callback(this.context, [this]);
+			this.callback.apply(this.context, [this]);
 		}
 	}
 
@@ -229,7 +221,7 @@ function Shinkansen (){
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
 		var _focalLength	= 300;
-		var _rotation;
+		var _rotation		= 0;
 		var _angular        = 30;
 		
 		var _emitter		= new Emitter(this);
@@ -411,8 +403,9 @@ function Shinkansen (){
 
 			var length = _itemsList.length;
 			for (var index=0; index < length; index++) {
-				item = _itemsList[index];
-				item.emit();
+				item		= _itemsList[index];
+				item.depth	= index;
+				item.emit.apply(item);
 			}
 			
 			emitEvent(Shinkansen.RENDER);
