@@ -37,3 +37,13 @@ img {
 	width:100%;
 	overflow: hidden;
 }
+
+ul {
+	font-family: Arial, Helvetica, sans-serif;
+	color : white;
+}
+
+p {
+	display: inline-block;
+	padding-right:10px; 
+}

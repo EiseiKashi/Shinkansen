@@ -456,7 +456,7 @@ function Shinkansen (){
 			var isInRange
 			var index  = 0;
 			
-			while (index < length) {
+			for (var index=0;index < length; index++) {
 				item	= _itemsList[index];
 				item.updateProperties();
 
@@ -490,8 +490,6 @@ function Shinkansen (){
 				item.renderY = renderY;
 				item.render  = renderZ;
 				item.scale	 = scaleFactor;
-				
-				index++;
 			}
 			
 			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);

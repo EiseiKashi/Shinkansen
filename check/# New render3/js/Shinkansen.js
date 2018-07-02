@@ -147,30 +147,30 @@ function Shinkansen (){
 	}
 	
 	var clipIdCounter = 0;
-	var Clip3D = function (data, x, y, z) {
+	var Clip3D = function (view, x, y, z, callback, context) {
 		'use strict';
 
-		var _id			= clipIdCounter;
+		var _id		= clipIdCounter;
+		this.getId	= function() {
+			return _id;
+		}
 		clipIdCounter++;
 		
 		var _x;
 		var _y;
 		var _z;
 
-		this.x			= _x = isNumber(x) ? x : 0;
-		this.y			= _y = isNumber(y) ? y : 0;
-		this.z			= _z = isNumber(z) ? z : 0;
-		
-		this.data		= data;
-		this.renderX	= 0;
-		this.renderY	= 0;
-		this.renderZ	= 0;
-		this.scale      = 0;
-		this.visible	= true;
+		this.x		= x;
+		this.y		= y;
+		this.z		= z;
 
-		this.getId = function() {
-			return _id;
-		}
+		this.renderX;
+		this.renderY;
+		this.renderZ;
+		this.scale;
+		this.visible;
+
+		this.view	= view;
 
 		this.updateProperties = function(){
 			if(_x != this.x){
@@ -196,6 +196,10 @@ function Shinkansen (){
 					this.z = _z
 				}
 			}
+		}
+
+		this.setRender = function(x, y, z, scale, visible){
+			callback.apply(context, [this])
 		}
 	}
 
@@ -371,12 +375,11 @@ function Shinkansen (){
 				
 				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
 				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
-				var renderZ = z;
-				var scale    = scaleFactor;
+				var renderZ = radius;
 				
 				item.renderX = renderX;
 				item.renderY = renderY;
-				item.render  = renderZ;
+				item.renderZ = renderZ;
 				item.scale	 = scaleFactor;
 				
 				index++;
@@ -495,29 +498,12 @@ function Shinkansen (){
 			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
 			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
 			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian, _cameraX, _cameraZ);
+			_pointLength		= getRotatedPoint(0, _focalLength,  _radian,     _cameraX, _cameraZ);
 
-			var test 		 = getRotatedPoint(60, 0,  _radian, _cameraX, _cameraZ);
 			_self.debuger.x  = _cameraX;
 			_self.debuger.y  = _cameraZ;
-			_self.debuger.x1 =  test.x;
-			_self.debuger.y2 =  test.y;
-			
-			var radian        = getRadianFromRotation(getRotationFromRadian(_radian) -45);
-			var test 		  = getRotatedPoint(60, 0,  radian, _cameraX, _cameraZ);
-			_self.debuger.hx  = _cameraX;
-			_self.debuger.hy  = _cameraZ;
-			_self.debuger.hx1 =  test.x;
-			_self.debuger.hy2 =  test.y;
-			
-			var radian        = getRadianFromRotation(getRotationFromRadian(_radian)+ 45);
-			var test 		  = getRotatedPoint(60, 0,  radian, _cameraX, _cameraZ);
-			_self.debuger.mx  = _cameraX;
-			_self.debuger.my  = _cameraZ;
-			_self.debuger.mx1 =  test.x;
-			_self.debuger.my2 =  test.y;
-
-			
+			_self.debuger.x1 = _pointLength.x;
+			_self.debuger.y2 = _pointLength.y;
 
 			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
 			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);
@@ -528,9 +514,9 @@ function Shinkansen (){
 			_cameraY1 			= leftPoint.y;
 			_cameraX2 			= rigthPoint.x;
 			_cameraY2 			= rigthPoint.y;
-			/*
+		
 			_slope				= (_cameraY2 - _cameraY1) / (_cameraX2 - _cameraX1);
-			_interceptorY		= _cameraY1 - _slope * _cameraX1;*/
+			_interceptorY		= _cameraY1 - _slope * _cameraX1;
 		}
 		
 		var getRotatedPoint  = function(x, y, radian, originX, originY) {
@@ -583,11 +569,13 @@ function Shinkansen (){
 			//https://www.youtube.com/watch?v=bfZ57ESvFok
 		}
 		
-		var getPointIntersection  = function(itemX, itemY) {
-			var m2 = -(1 / _slope);
-			var b2  = itemY - m2 * itemX;
-			var x2  = (b2-_interceptorY)/(_slope-m2);
-			var y2  = (m2 * x2 + b2);
+		var getPointIntersection  = function(itemX, itemY, x, y, x1, y1) {
+			var slope			= (y1 - y) / (x1 - x);
+			var interceptorY	= y1 - slope * x1;
+			var m2 				= -(1 / slope);
+			var b2  			= itemY - m2 * itemX;
+			var x2  			= (b2-interceptorY)/(slope-m2);
+			var y2  			= (m2 * x2 + b2);
 			return new Point(x2, y2);
 		}
 		
