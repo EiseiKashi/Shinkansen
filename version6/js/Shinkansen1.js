@@ -322,14 +322,7 @@ function Shinkansen (){
 		this.onDebug = function(){
 
 		}
-
-		this.doRender = function() {
-			var length = _itemsList.length;
-			if(0 == length){
-				// Early return
-				return;
-			}
-
+		this.fixProperties = function(){
 			if(_cameraX != _self.cameraX){
 				if(isNumber(_self.cameraX)){
 					_cameraX = _self.cameraX;
@@ -365,10 +358,10 @@ function Shinkansen (){
 			if(_self.rotation != _rotation){
 				if(isNumber(_self.rotation)){
 					_rotation	= ((_self.rotation%360)+360)%360;
-					_radian		= _rotation * (PI2/360);
 				}else{
 					_self.rotation = _rotation;
 				}
+				_radian		= _rotation * (PI2/360);
 			}
 			
 			if(_self.angular != _angular){
@@ -378,7 +371,17 @@ function Shinkansen (){
 					_self.angular = _angular;
 				}
 			}
+		}
 
+		this.doRender = function() {
+			var length = _itemsList.length;
+			if(0 == length){
+				// Early return
+				return;
+			}
+
+			fixProperties();
+			
 			/*
 			backAndForth = function(){
 				cameraView.z += speed*dir;
@@ -406,23 +409,6 @@ function Shinkansen (){
 
 			
 			*/
-			
-			var halfViewPort	= _viewPortX / 2;
-			var visionLength	= getHipotenuse(halfViewPort, _focalLength);
-			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
-			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
-			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian, _cameraX, _cameraZ);
-
-			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
-			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);
-			
-			_visionRadian		= getVectorsRadian(leftPoint.x, leftPoint.y, _pointLength.x, _pointLength.y);
-			
-			_cameraX1 			= leftPoint.x; 
-			_cameraY1 			= leftPoint.y;
-			_cameraX2 			= rigthPoint.x;
-			_cameraY2 			= rigthPoint.y;
 
 			var test 		 = getRotatedPoint(60, 0,  _radian, _cameraX, _cameraZ);
 			_self.debuger.x  = _cameraX1;

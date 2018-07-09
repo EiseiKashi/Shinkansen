@@ -1,28 +1,60 @@
 /*
 	Version 0.0.1
-	# Remove Viewport
+	# Change alghoritm 1
 */
 
 var version = 10;
 document.title = version + " Shinkansen";
 
+// ::: EMITTER ::: //
+var MOUSE_OVER      = "mouseOver";
+var MOUSE_OUT       = "mouseOut";
+var MOUSE_UP        = "mouseUp";
+var MOUSE_DOWN      = "mouseDown";
+var MOUSE_LEAVE     = "mouseLeave";
+var CLICK           = "click";
+var DROP            = "drop";
+var DRAG            = "drag";
+var DRAGING         = "draging";
+var FUNCTION        = "function";
+var OBJECT          = "object";
+
 function Shinkansen (){
 	'use strict'
 
-	var _requestAnimationFrame = window.requestAnimationFrame;
-	if(null == _requestAnimationFrame){
-		var vendors  = ['ms', 'moz', 'webkit', 'o'];
-		
-		for(var x = 0; x < vendors.length && !_requestAnimationFrame; ++x) {
-			_requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-		}
-		
-		if (!_requestAnimationFrame){
-			_requestAnimationFrame = function(callback) {
-				setTimeout(callback, 10);
-			};
-		}
-	}
+	var isString = typeof element === "string";
+    if(isString){
+        element = document.getElementById(element);
+        if(null == element){
+            throw "There is no element with the 'id': " + element;
+        }
+    }
+    
+    window.check = true;
+    var lastTime = 0;
+    var vendors  = ['ms', 'moz', 'webkit', 'o'];
+    
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame  = window[vendors[x]+'CancelAnimationFrame'] 
+                                     || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+    
+    if (!window.requestAnimationFrame){
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime   = Date.now();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id         = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
+            lastTime       = currTime + timeToCall;
+            return id;
+        };
+    }
+    
+    if (!window.cancelAnimationFrame){
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        }
+    }
 	
 	var isNumber = function(number){
 		var isNull   = null == number;
@@ -37,166 +69,23 @@ function Shinkansen (){
 		}
 		return true;
 	}
-	// ::: EMITTER ::: //
-    var Emitter = function(target){
-        'use strict';
-        var _typeCounter   = 0;
-        var _hasMouse      = false;
-                           
-        var CONTEXT        = 0;
-        var LISTENER       = 1;
-        var _target        = target;
-        
-        var _listenerTypes = {};
-        var _listenerList;
-        
-        var listener;
-        
-        this.addEventListener = function(type, listener, context){
-            if(null == type || type == "" || typeof listener !== FUNCTION ){
-                return;
-            }
-            _listenerList = _listenerTypes[type];
-            if(null == _listenerList){
-                _listenerList = _listenerTypes[type] = [];
-            }
-            
-            var length = _listenerList.length;
-            for(var index=0; index < length; index++){
-                if(listener[LISTENER] == listener && 
-                   listener[CONTEXT]  == context){
-                    return;
-                }
-            }
-            _listenerTypes[type].push([context, listener]);
-            switch(type){
-                case CLICK : 
-                case MOUSE_OVER :
-                case MOUSE_OUT :
-                case MOUSE_DOWN : 
-                case MOUSE_UP :
-                case MOUSE_LEAVE : 
-                case MOUSE_LEAVE : 
-                case DRAG :
-                case DROP :
-                _typeCounter++;
-                break;
-            }
-            
-            _hasMouse = true;
-            return _hasMouse;
-        }
-        
-        this.removeEventListener = function(type, listener, context){
-            if(null == type || type == "" || typeof listener !== FUNCTION ){
-                return;
-            }
-            
-            _listenerList = _listenerTypes[type];
-            if(null == _listenerList){
-                return
-            }
-            
-            var length = _listenerList.length;
-            for(var index=0; index < length; index++){
-                listener = _listenerList[index];
-                if(listener[LISTENER] == listener && 
-                   listener[CONTEXT]  == context){
-                    _listenerTypes[type].splice(index, 1);
-                    switch(type){
-                        case CLICK : 
-                        case MOUSE_OVER :
-                        case MOUSE_OUT :
-                        case MOUSE_DOWN : 
-                        case MOUSE_UP :
-                        case MOUSE_LEAVE : 
-                        case MOUSE_LEAVE : 
-                        case DRAG :
-                        case DROP :
-                        _typeCounter--;
-                        break;
-                    }
-                    _typeCounter = Math.min(_typeCounter, 0);
-                    _hasMouse = _typeCounter > 0;
-                    return true;
-                }
-            }
-        }
-        
-        this.emit = function(type, data){
-            if(null == type || type == ""){
-                return;
-            }
-            _listenerList = _listenerTypes[type];
-            if(null == _listenerList){
-                return
-            }
-            data        = null == data || typeof data != OBJECT ? {} : data;
-            data.type   = type;
-            data.target = _target;
-            var length  = _listenerList.length;
-            for(var index=0; index < length; index++){
-                listener = _listenerList[index];
-            listener[LISTENER].apply(listener[CONTEXT], [data]);
-            }
-        }
-        
-        this.hasMouse = function(){
-            return _hasMouse;
-        }
-	}
 	
-	var clipIdCounter = 0;
-	var Clip3D = function (data, x, y, z) {
+	var _orderCounter = 0;
+
+	var Clip3D = function (xyz, data, callback, context) {
 		'use strict';
 
-		var _id			= clipIdCounter;
-		clipIdCounter++;
+		this.order		= _orderCounter++;
 		
-		var _x;
-		var _y;
-		var _z;
-
-		this.x			= _x = isNumber(x) ? x : 0;
-		this.y			= _y = isNumber(y) ? y : 0;
-		this.z			= _z = isNumber(z) ? z : 0;
-		
+		this.xyz		= xyz;
 		this.data		= data;
-		this.renderX	= 0;
-		this.renderY	= 0;
-		this.renderZ	= 0;
-		this.scale      = 0;
+		this.callback	= callback;
+		this.context	= context;
+		this.x 			= 0;
+		this.y 			= 0;
+		this.z 			= 0;
+		this.scale		= 1;
 		this.visible	= true;
-
-		this.getId = function() {
-			return _id;
-		}
-
-		this.updateProperties = function(){
-			if(_x != this.x){
-				if(isNumber(this.x)){
-					_x = this.x;
-				}else{
-					this.x = _x
-				}
-			}
-
-			if(_y != this.y){
-				if(isNumber(this.y)){
-					_y = this.y;
-				}else{
-					this.y = _y
-				}
-			}
-
-			if(_z != this.z){
-				if(isNumber(this.z)){
-					_z = this.z;
-				}else{
-					this.z = _z
-				}
-			}
-		}
 	}
 
 	var Shinkansen = function() {
@@ -213,107 +102,45 @@ function Shinkansen (){
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
 		var _focalLength	= 300;
-		var _rotation;
+		var _rotation		= 0;
 		
 		var _emitter		= new Emitter(this);
 		
 		var PI2				= Math.PI * 2;
 		
-		var _itemsList		= new Array();
-		var _callbacksList	= new Array();
-		
-		var _radian			= 0;
+		var _itemList		= new Array();
 		
 		var _offsetX		= 0;
 		var _offsetY		= 0;
-		
-		var _cameraX1		= -1;
-		var _cameraX2		= 1;
-		var _cameraY1		= 0;
-		var _cameraY2		= 0;
-		
-		var _viewPortX;
-		var _viewPortY;
-		
-		var _visionRadian;
-		var _pointLength;
-		var _slope;
-		var _interceptorY;
+
+		var item; var x; var y; var z; var radius; var angle;
+		var scale; var xyz; var visible;
 		
 		//----------------------------------------------
 		// INTERFACE
 		//----------------------------------------------
-		
-		this.getViewPortX = function () {return _viewPortX;}
-		this.setViewPortX = function (value) {
-			if(isNumber(value)){
-				_viewPortX = value;
+		this.add = function(callback, data, context){
+			if(typeof callback != 'function'){
+				throw new Error("First argument 'callback' must be a Function");
 			}
-			return _viewPortX;
-		}
-		
-		this.getViewPortY = function () {return _viewPortY;}
-		this.setViewPortY = function (value) {
-			if(isNumber(value)){
-				_viewPortY = value;
-			}
-			return _viewPortY;
-		}
-		
-		this.addCallback = function (callback) {
-			if (_callbacksList.indexOf(callback) < 0) {
-				_callbacksList.push(callback);
-			}
-		}
-		
-		this.removeCallBack = function(callback) {
-			var index = _callbacksList.indexOf(callback);
-			if (index < 0) {
-				return;
-			}
-			_callbacksList.splice(index, 1);
-		}
-		
-		this.addNew = function(data, x, y, z){
-			var item = new Clip3D(data, x, y, z);
-			_self.add(item);
-			return item;
+			var xyz	 = {x:0, y:0, z:0};
+			
+			var item = new Clip3D(xyz, data, callback, context);
+			_itemList.push(item);
+
+			emitEvent(Shinkansen.ADD, xyz);
+			
+			return xyz;
 		}
 
-		this.add = function(item) {
-			if(null == item){
-				throw new Error("Can not add a null item");
-			}
-			_itemsList.push(item);
-			emitEvent(Shinkansen.ADD, item);
-		}
-		
-		this.remove = function (item) {
-			_itemsList.push(item);
-			var index = _itemsList.indexOf(item);
+		this.remove = function (xyz) {
+			var index = _itemList.indexOf(xyz);
 			if (index < 0) {
 				return;
 			}
-			_itemsList.splice(index, 1);
+			_itemList.splice(index, 1);
+
 			emitEvent(Shinkansen.REMOVE, item);
-		}
-		
-		//----------------------------------------------
-		// Desplazamiento de camera
-		this.getOffsetY = function () {return _offsetY;}
-		this.setOffsetY = function (value) {
-			if(isNumber(value)){
-				_offsetY = value;
-			}
-			return _offsetY;
-		}
-		
-		this.getOffsetX = function () {return _offsetX;}
-		this.setOffsetX = function (value) {
-			if(isNumber(value)){
-				_offsetX = value;
-			}
-			return _offsetX;
 		}
 
 		this.debuger = {};
@@ -321,135 +148,13 @@ function Shinkansen (){
 
 		}
 
-		this.doRender = function() {
-			var length = _itemsList.length;
+		this.doRender = function() {RENDER
+			var length = _itemList.length;
 			if(0 == length){
 				// Early return
 				return;
 			}
 			
-			updateProperties();
-			
-			var dx;
-			var dy;
-			var z;
-			var item;
-			var itemX;
-			var itemY;
-			var scaleFactor;
-			var name;
-			var viewName;
-			var isInRange
-			var index  = 0;
-			
-			while (index < length) {
-				item	= _itemsList[index];
-				item.updateProperties();
-
-				itemX	= item.x;
-				itemY	= item.z;
-				
-				isInRange		= checkIsInRange(itemX, itemY);
-				
-				if (!isInRange) {
-					item.visible = false;
-					item.scale   = 0;
-					index++;
-					continue;
-				}
-				
-				dx = itemX - _cameraX;
-				dy = itemY - _cameraZ;
-				
-				var itemRadian	= Math.atan2(dy,dx) + _radian;
-				var radius		= getHipotenuse(dx, dy);
-				z				= getPointDistance(	itemX, itemY,
-													_cameraX1, _cameraY1,
-													_cameraX2, _cameraY2);
-				scaleFactor		= _focalLength / (z);
-				item.visible	= scaleFactor > 0 ;
-				
-				var renderX	= (Math.cos(itemRadian) * radius * scaleFactor) + _offsetX;
-				var renderY = ((item.y - _cameraY) * scaleFactor) + _offsetY;
-				var renderZ = z;
-				var scale    = scaleFactor;
-				
-				item.renderX = renderX;
-				item.renderY = renderY;
-				item.render  = renderZ;
-				item.scale	 = scaleFactor;
-				
-				index++;
-			}
-			
-			//_itemsList.sortOn("renderZ", Array.DESCENDING | Array.NUMERIC);
-			_itemsList.sort(function(a, b){
-				if(a.scale == b.scale){
-					return 0;
-				}else if(a.scale < b.scale){
-					return -1;
-				}else if(a.scale > b.scale){
-					return 1;
-				}
-			});
-			
-			index = 0;
-			var callback;
-			var indexCallback	= 0;
-			var callbacksLenght	= _callbacksList.length;
-			var lastIndex		= length-1;
-			while (index < length) {
-				item = _itemsList[index];
-				indexCallback = 0;
-				while (indexCallback < callbacksLenght) {
-					callback = _callbacksList[indexCallback];
-					callback(item.data, 
-							 index, 
-							 item.renderX,
-							 item.renderY,
-							 item.renderZ,
-							 item.scale,
-							 item.visible);
-					indexCallback++
-				}
-				index++
-			}
-
-			emitEvent(Shinkansen.RENDER);
-		}
-
-		// Add listener
-        this.addEventListener = function (type, listener, context){
-            _emitter.addEventListener(type, listener, context);
-        }
-        
-        // Remove Listener
-        this.removeEventListener = function (type, listener, context){
-            _emitter.removeEventListener(type, listener, context);
-		}
-		
-		var emitEvent = function(type, data){
-            _emitter.emit(type, data);
-		}
-
-		//----------------------------------------------
-		// Helpers
-		//----------------------------------------------
-		
-		var getHipotenuse  = function(dx, dy) {
-			var hypotenuse =  Math.sqrt(dx * dx + dy * dy);
-			return hypotenuse;
-		}
-		
-		var getRadianFromRotation  = function(degree){
-			return degree * (PI2/360);
-		}
-		
-		var getRotationFromRadian  = function(radian) {
-			return radian * (360/PI2);
-		}
-		
-		var updateProperties  = function() {
 			if(_cameraX != _self.cameraX){
 				if(isNumber(_self.cameraX)){
 					_cameraX = _self.cameraX;
@@ -482,124 +187,111 @@ function Shinkansen (){
 				}
 			}
 
-			if(isNumber(_self.rotation) && _self.rotation != _rotation){
-				var radian = getRadianFromRotation(_self.rotation);
-				if(isNumber(radian)){
-					_radian = radian;
-					_rotation  = getRotationFromRadian(radian);
+			if(_offsetX != _self._offsetX){
+				if(isNumber(_self._offsetX)){
+					_offsetX = _self._offsetX;
+				}else{
+					_self._offsetX = _offsetX;
 				}
 			}
-			
-			var halfViewPort	= _viewPortX / 2;
-			var visionLength	= getHipotenuse(halfViewPort, _focalLength);
-			var leftRadian		= Math.atan2(0, halfViewPort) + _radian;
-			var rigthRadian		= Math.atan2(0, -halfViewPort)+ _radian;
-			
-			_pointLength		= getRotatedPoint(0, _focalLength,  _radian,     _cameraX, _cameraZ);
 
-			_self.debuger.x  = _cameraX;
-			_self.debuger.y  = _cameraZ;
-			_self.debuger.x1 = _pointLength.x;
-			_self.debuger.y2 = _pointLength.y;
+			if(_offsetY != _self._offsetY){
+				if(isNumber(_self._offsetY)){
+					_offsetY = _self._offsetY;
+				}else{
+					_self._offsetY = _offsetY;
+				}
+			}
 
-			var leftPoint		= getRotatedPoint(visionLength, 0,  leftRadian,  _cameraX, _cameraZ);
-			var rigthPoint		= getRotatedPoint(visionLength, 0,  rigthRadian, _cameraX, _cameraZ);
-			
-			_visionRadian		= getVectorsRadian(leftPoint.x, leftPoint.y, _pointLength.x, _pointLength.y);
-			
-			_cameraX1 			= leftPoint.x; 
-			_cameraY1 			= leftPoint.y;
-			_cameraX2 			= rigthPoint.x;
-			_cameraY2 			= rigthPoint.y;
-			/*
-			_slope				= (_cameraY2 - _cameraY1) / (_cameraX2 - _cameraX1);
-			_interceptorY		= _cameraY1 - _slope * _cameraX1;*/
-		}
-		
-		var getRotatedPoint  = function(x, y, radian, originX, originY) {
-			originX		= getDefaultValue(originX, 0);
-			originY		= getDefaultValue(originY, 0);
-			
-			var finalX	= x * Math.cos(radian) - y * Math.sin(radian) + originX;
-			var finalY	= x * Math.sin(radian) + y * Math.cos(radian) + originY;
-			var point	= new Point(finalX, finalY);
-			return point;
-		}
-		
-		var checkIsInRange  = function(x, y) {
-			var radian = getVectorsRadian(_pointLength.x, _pointLength.y, x, y);
-			return _visionRadian > radian;
-		}
-		
-		var getVectorsRadian  = function(point1X, point1Y, point2X, point2Y ) {
-			point1X		-= _cameraX;
-			point1Y		-= _cameraZ;
-			
-			point2X		-= _cameraX;
-			point2Y		-= _cameraZ;
-			
-			var scalar	=  point1X * point2X + point1Y * point2Y;
-			var mod1	= getHipotenuse(point1X, point1Y);
-			var mod2	= getHipotenuse(point2X, point2Y);
-			var mods	= (mod1 * mod2); 
-			
-			var radianToCalculate = mods == 0 ? 0 : scalar / mods;
-			var radian= Math.acos(radianToCalculate);
-			if(isNaN(radian)){
-				return;
+			if(isNumber(_self.rotation) && _self.rotation != _rotation){
+				_rotation = _self.rotation;
+			}else{
+				_self.rotation = _rotation;
+			}
+
+			_rotation	= ((_rotation%360)+360)%360;
+			var radian  = _rotation * (PI2/360);
+
+			for(var index=0; index < length; index++){
+				item	= _itemList[index];
+				xyz		= item.xyz;
+
+				x = (xyz.x - _cameraX);
+				y = (xyz.y - _cameraY);
+				z = (xyz.z - _cameraZ);
+
+				z = _focalLength/(_focalLength + z);
+				
+				item.x 	= _offsetX + x * z;
+				item.y	= _offsetY + y * z;
+				item.z	= z;
+
+				item.visible = z < -_focalLength;
 			}
 			
-			while (isNaN(radian)) {
-				radian = Math.acos(int(radianToCalculate * 10) / 10);
+			_itemList.sort(sortList);
+
+			for(var index=0; index < length; index++){
+				item 	= _itemList[index];
+
+				var render	= {
+								x			: item.x
+								,y			: item.y
+								,z			: item.z
+								,xyz		: item.xyz
+								,data		: item.data
+								,index      : index
+								,visible	: item.visible
+							}
+				
+				item.callback.call(item.context, render);
 			}
-			return radian;
+
+		}
+
+		// Add listener
+        this.addEventListener = function (type, listener, context){
+            _emitter.addEventListener(type, listener, context);
+        }
+        
+        // Remove Listener
+        this.removeEventListener = function (type, listener, context){
+            _emitter.removeEventListener(type, listener, context);
 		}
 		
-		var getPointDistance  = function(itemX, itemY, 
-										  x1, y1, x2, y2) {
-			var denominator = Math.abs((y2 - y1) * itemX - (x2 - x1) * itemY + x2 * y1 - y2 * x1);
-			var divisor     = Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 -x1, 2));
-			return denominator / divisor;
+		var emitEvent = function(type, data){
+            _emitter.emit(type, data);
+		}
+
+		//----------------------------------------------
+		// Helpers
+		//----------------------------------------------
+		var sortList = function(itemA, itemB){
+			if(itemA.z == itemB.z){
+				if(itemA.order < itemB.order){
+					return -1;
+				}
+				
+				if(itemA.order > itemB.order){
+					return 1;
+				};
+			}
+
+			if(itemA.z < itemB.z){
+				return -1;
+			}
 			
-			// d = 	|A·Mx + B·My + C|
-			//			√A2 + B2		
-			//https://www.youtube.com/watch?v=bfZ57ESvFok
-		}
-		
-		var getPointIntersection  = function(itemX, itemY) {
-			var m2 = -(1 / _slope);
-			var b2  = itemY - m2 * itemX;
-			var x2  = (b2-_interceptorY)/(_slope-m2);
-			var y2  = (m2 * x2 + b2);
-			return new Point(x2, y2);
-		}
-		
-		var Point  = function(x, y) {
-			this.x = x;
-			this.y = y;
-		}
-		
-		var getDefaultValue = function(value, defaultValue) {
-			var finalValue = typeof(value) === "undefined" ? defaultValue : value;
-			return finalValue;
+			if(itemA.z > itemB.z){
+				return 1;
+			}
 		}
 
 		var update = function(){
-			_requestAnimationFrame(update);
+			requestAnimationFrame(update);
 			_self.doRender.apply(_self);
 		}
-		_requestAnimationFrame(update);
+		requestAnimationFrame(update);
 	}
-
-	Shinkansen.ADD			= "add";
-	Shinkansen.REMOVE		= "remove";
-	Shinkansen.CAMERA_X		= "cameraX";
-	Shinkansen.CAMERA_Y		= "cameraY";
-	Shinkansen.CAMERA_Z		= "cameraZ";
-	Shinkansen.ROTATION		= "Rotation";
-	Shinkansen.RADIAN		= "radian";
-	Shinkansen.FOCAL_LENGTH	= "focalLength";
-	Shinkansen.RENDER		= "render";
 
 	return new Shinkansen();
 }
