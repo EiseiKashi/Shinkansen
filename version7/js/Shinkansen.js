@@ -1,9 +1,9 @@
 /*
-	Version 0.0.1
-	# Change alghoritm 1
+	Version 0.0.13
+	# Change alghoritm 3
 */
 
-var version = 10;
+var version = 13;
 document.title = version + " Shinkansen";
 
 // ::: EMITTER ::: //
@@ -72,25 +72,27 @@ function Shinkansen (){
 	
 	var _orderCounter = 0;
 
-	var Clip3D = function (xyz, data, callback, context) {
+	var Clip3D = function (object2D, object3D, view, callback, context) {
 		'use strict';
 
-		this.order		= _orderCounter++;
+		this.order		 = _orderCounter++;
+
+		this.object2D	 = object2D;
+		this.object3D	 = object3D;
 		
-		this.xyz		= xyz;
-		this.data		= data;
-		this.callback	= callback;
-		this.context	= context;
-		this.x 			= 0;
-		this.y 			= 0;
-		this.z 			= 0;
-		this.scale		= 1;
-		this.visible	= true;
+		object3D.x 		 = 0;
+		object3D.y 		 = 0;
+		object3D.z 		 = 0;
+		object3D.scale	 = 1;
+		object3D.visible = true;
+		
+		this.view		 = view;
+		this.callback	 = callback;
+		this.context	 = context;
 	}
 
 	var Shinkansen = function() {
 		'use strict';
-		var _self			= this;
 		
 		this.cameraX;
 		this.cameraY;
@@ -98,6 +100,7 @@ function Shinkansen (){
 		this.focalLength;
 		this.rotation;
 		
+		var _self			= this;
 		var _cameraX		= 0;
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
@@ -108,48 +111,58 @@ function Shinkansen (){
 		
 		var PI2				= Math.PI * 2;
 		
-		var _itemList		= new Array();
+		var _clipList		= new Array();
 		
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 
-		var item; var x; var y; var z; var radius; var angle;
+		var clip; var x; var y; var z; var radius; var angle;
 		var scale; var xyz; var visible;
 		
 		//----------------------------------------------
 		// INTERFACE
 		//----------------------------------------------
-		this.add = function(callback, data, context){
-			if(typeof callback != 'function'){
-				throw new Error("First argument 'callback' must be a Function");
+		this.add = function(object2D, view, callback, context){
+			if(typeof object2D != 'object'){
+				object2D = {};
 			}
-			var xyz	 = {x:0, y:0, z:0};
-			
-			var item = new Clip3D(xyz, data, callback, context);
-			_itemList.push(item);
 
-			emitEvent(Shinkansen.ADD, xyz);
+			object2D.x	= isNumber(object2D.x) ? object2D.x : 0;
+			object2D.y	= isNumber(object2D.y) ? object2D.y : 0;
+			object2D.z	= isNumber(object2D.z) ? object2D.z : 0;
+
+			object3D	= {}
+			object3D.x	= 0;
+			object3D.y	= 0;
+			object3D.z	= 0;
 			
-			return xyz;
+			var clip = new Clip3D(object2D, object3D, view, callback, context);
+			_clipList.push(clip);
+
+			emitEvent(Shinkansen.ADD, clip);
+
+			return {object2D:object2D, object3D:object3D, view:view};
 		}
 
-		this.remove = function (xyz) {
-			var index = _itemList.indexOf(xyz);
-			if (index < 0) {
-				return;
+		this.remove = function (clip) {
+			var object3D = clip.object3D;
+			var length	= _clipList.length;
+			var clip;
+			for(var index=0; index < length; index++){
+				clip = _clipList[index];
+				if(clip.object3D == object3D){
+					_clipList.splice(index, 1);
+				}
 			}
-			_itemList.splice(index, 1);
-
-			emitEvent(Shinkansen.REMOVE, item);
+			emitEvent(Shinkansen.REMOVE, clip);
 		}
 
 		this.debuger = {};
 		this.onDebug = function(){
-
 		}
 
-		this.doRender = function() {RENDER
-			var length = _itemList.length;
+		this.doRender = function() {
+			var length = _clipList.length;
 			if(0 == length){
 				// Early return
 				return;
@@ -213,40 +226,27 @@ function Shinkansen (){
 			var radian  = _rotation * (PI2/360);
 
 			for(var index=0; index < length; index++){
-				item	= _itemList[index];
-				xyz		= item.xyz;
-
-				x = (xyz.x - _cameraX);
-				y = (xyz.y - _cameraY);
-				z = (xyz.z - _cameraZ);
-
-				z = _focalLength/(_focalLength + z);
-				
-				item.x 	= _offsetX + x * z;
-				item.y	= _offsetY + y * z;
-				item.z	= z;
-
-				item.visible = z < -_focalLength;
+				clip			= _clipList[index];
+				object2D		= clip.object2D;
+				object3D		= clip.object3D;
+				x				= (object2D.x - _cameraX);
+				y				= (object2D.y - _cameraY);
+				z				= (object2D.z - _cameraZ);
+				z 				= _focalLength/(_focalLength + z);
+				object3D.x 		= _offsetX + x * z;
+				object3D.y		= _offsetY + y * z;
+				object3D.z		= z;
+				object3D.visible= z < -_focalLength;
 			}
 			
-			_itemList.sort(sortList);
+			_clipList.sort(sortList);
 
 			for(var index=0; index < length; index++){
-				item 	= _itemList[index];
-
-				var render	= {
-								x			: item.x
-								,y			: item.y
-								,z			: item.z
-								,xyz		: item.xyz
-								,data		: item.data
-								,index      : index
-								,visible	: item.visible
-							}
-				
-				item.callback.call(item.context, render);
+				clip = _clipList[index];
+				clip.callback.call(clip.context, clip.object2D, clip.object3D, clip.view);
 			}
 
+			emitEvent(RENDER);
 		}
 
 		// Add listener
@@ -266,22 +266,27 @@ function Shinkansen (){
 		//----------------------------------------------
 		// Helpers
 		//----------------------------------------------
-		var sortList = function(itemA, itemB){
-			if(itemA.z == itemB.z){
-				if(itemA.order < itemB.order){
+		var sortList = function(clipA, clipB){
+			var az; var bz; var a3d; var b3d;
+			a3d = clipA.object3D;
+			b3d = clipB.object3D;
+			az  = a3d.z;
+			bz  = b3d.z;
+			if(az == bz){
+				if(a3d.order < b3d.order){
 					return -1;
 				}
 				
-				if(itemA.order > itemB.order){
+				if(a3d.order > b3d.order){
 					return 1;
 				};
 			}
 
-			if(itemA.z < itemB.z){
+			if(az < bz){
 				return -1;
 			}
 			
-			if(itemA.z > itemB.z){
+			if(az > bz){
 				return 1;
 			}
 		}

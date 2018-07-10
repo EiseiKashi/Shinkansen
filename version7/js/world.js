@@ -1,257 +1,159 @@
-var currentProperty;
-
-function onDown (event){
-	if(null == currentProperty){
-		//Early return
-		return;
-	}
-}
-
-function onUp (event){
-	if(null == currentProperty){
-		//Early return
-		return;
-	}
-}
-
-var keyHandler = new KeyHandler(document);
-	keyHandler.onDown("down", onDown);
-	keyHandler.onUp("up", onUp);
-	keyHandler.onDown("r", function(){currentProperty="rotation"});
-	keyHandler.onDown("f", function(){currentProperty="focalLength"});
-	keyHandler.onDown("x", function(){currentProperty="cameraX"});
-	keyHandler.onDown("y", function(){currentProperty="cameraY"});
-	keyHandler.onDown("z", function(){currentProperty="cameraZ"});
 ///////////////////////////////
-
-function onRender(render){
-	var view = render.data;
-		//view.style.display = visible ? "inline" : "none";
-		view.style.left    = render.x + "px";
-		view.style.top     = render.y + "px";
-		var scale = render.z;
-		view.style.width   = (scale*99) + "px";
-		view.style.height  = (scale*99) + "px";
-		view.style.zIndex  = render.index;
-}
-
-///////////////////////////////
-var dir = -1;
-var speed = 20;
-function onTick(){
-	shinkansen.cameraZ += speed*dir;
-	if (shinkansen.cameraZ > 500){
-		shinkansen.cameraZ = 500;
-		dir = -1;
-	}else if (shinkansen.cameraZ < 0){
-		shinkansen.cameraZ = 0;
-		dir = 1;
-	}
-}
-
-var id = setInterval(onTick, 20);
-
-///////////////////////////////
-
+// CAMERA
 var shinkansen = new Shinkansen();
-	shinkansen.offsetX = 150;
-	shinkansen.offsetY = 150;
-	shinkansen.cameraZ = 500;
-	shinkansen.focalLength = 300;
+	shinkansen.offsetX		= 150;
+	shinkansen.offsetY		= 150;
 
-	var image = document.getElementById("imagen9");
+	shinkansen.cameraX		= 0;
+	shinkansen.cameraY		= -100;
+	shinkansen.cameraZ		= 0;
 
-	var figureA = shinkansen.add(onRender, image);
-		figureA.x = 0;
-		figureA.y = 0;
-		figureA.z = 500;
+	shinkansen.focalLength	= 300;
 
-/*
-var shinkansen;
-shinkansen = new Shinkansen();
-var viewPort = 300;
-shinkansen.setViewPortX (viewPort);
-shinkansen.setViewPortY (viewPort);
-shinkansen.setOffsetX   (viewPort / 2);
-shinkansen.setOffsetY   (viewPort/3);
-shinkansen.cameraX = 60;
-shinkansen.cameraY = 0;
-shinkansen.cameraZ = 30;
-		
-var camera = 0;
-
-shinkansen.rotation = 0;
-
-var intervalId = setInterval(function(){
-	shinkansen.rotation +=10;
-	camera -= 1;
-	if(camera < 0){
-		camera = 570;
-	}
-}, 500);
-
-var node;
-var item;
-		
-var _size			= 120;
-var fracc			= 120;
-var totalColumns	= 5;
-var totalRows    	= 2;
-var yPostion		= 0;
-var rowIndex		= 0;
-var columnIndex		= 0;
-var indexX			= 1;
-var index			= 0;
-var x;
-var y;
-while (rowIndex < totalRows) {
-	columnIndex = 0;
-	while(columnIndex < totalColumns) {
-		node	= document.getElementById("imagen" + index);
-		x		= columnIndex*_size;
-		y		= rowIndex*_size;
-		item	= shinkansen.addNew(onRender, node);
-		index++
-		columnIndex ++;
-	}
-	rowIndex++;
-}
-		
-function onRender(render) {
-	var view	=
-	var index	= 
-	var x		= item.renderX;
-	var y		= item.renderY;
-	var z		= item.renderZ;
-	var scale	= item.scale;
-	var visible	= item.visible;
-
-	var x
-	var y
-	var z
-	var data
-	var renderX
-	var renderY
-	var renderZ
-	var scale
-	var visible
-	view.style.display = visible ? "inline" : "none";
-	view.style.left    = x + "px";
-	view.style.top     = y + "px";
-	view.style.width   = (scale*99) + "px";
-	view.style.height  = (scale*99) + "px";
-	view.style.zIndex  = index;
-	mapCanvas.width  = mapCanvas.width;
-	mapCanvas.height = mapCanvas.height;
-	var x  = shinkansen.debuger.x;
-	var y  = shinkansen.debuger.y;
-	var x1 = shinkansen.debuger.x1;
-	var y1 = shinkansen.debuger.y2;
-	map.beginPath();
-	map.moveTo(x, y);
-	map.lineTo(x1, y1);
-	map.strokeStyle = '#0000FF';
-	map.stroke();
-
-	var x  = shinkansen.debuger.hx;
-	var y  = shinkansen.debuger.hy;
-	var x1 = shinkansen.debuger.hx1;
-	var y1 = shinkansen.debuger.hy2;
-	map.beginPath();
-	map.moveTo(x, y);
-	map.lineTo(x1, y1);
-	map.strokeStyle = '#FF0000';
-	map.stroke();
-
-	var x  = shinkansen.debuger.mx;
-	var y  = shinkansen.debuger.my;
-	var x1 = shinkansen.debuger.mx1;
-	var y1 = shinkansen.debuger.my2;
-	map.beginPath();
-	map.moveTo(x, y);
-	map.lineTo(x1, y1);
-	map.strokeStyle = '#00FF00';
-	map.stroke();
-}
-
-///////////////////////////////////////////////////////
-
-var mapCanvas = document.getElementById("cameraMap");
-var map = mapCanvas.getContext("2d");
-mapCanvas.width = 600;
-mapCanvas.height = 200;
-
-function CanvateWorld(totalColumns, totalRows, size){
-	'use strict'
-	var canvas;
-	var canvate;
-
-	var canvas 		  = document.getElementById("map");
-		canvas.width  = 600;
-		canvas.height = 150;
-
-	canvate = new Canvate(canvas);
-
-	var addToCanvate = function(node, x, y){
-		var img = canvate.addNew(node);
-			img.setSize(5, 5);
-			img.setPivot(.5, .5);
-			img.x = x;
-			img.y = y;
-	}
-
-	function display(totalColumns, totalRows, size){
-		var node;
-		var item;
-		var rowIndex		= 0;
-		var columnIndex		= 0;
-		var index			= 0;
-		var x;
-		var y;
-		while (rowIndex < totalRows) {
-			columnIndex = 0;
-			while(columnIndex < totalColumns) {
-				node	= document.getElementById("imagen" + index);
-				x		= columnIndex*size;
-				y		= rowIndex*size;
-				
-				addToCanvate(node, x, y);
+///////////////////////////////
+// CARS
+renderCar = function(xyz, render, view){
+	var rx		= render.x;
+	var ry		= render.y;
+	var rz		= render.z;
+	var scale	= render.scale;
+	var visible	= render.visible;
 	
-				index++
-				columnIndex ++;
-			}
-			rowIndex++;
+	if (rz < 4000){
+		if (rz < 0){
+			xyz.z += 3000;
+			xyz.x = 200-Math.random()*400;
 		}
-	}
-	display(totalColumns, totalRows, size);
-	cameraIcon = canvate.addNewByURL("img/camera.png");
-
-	canvate.addNewById("cameraMap");
-}
-
-var _size = 60;
-var totalColumns = 5;
-var totalRows = 2;
-
-function onDraging(){
-	clearInterval(intervalId);
-	if(shinkansen){
-		shinkansen.cameraX = cameraIcon.x;
-		shinkansen.cameraZ = cameraIcon.y;
+		xyz.z += xyz.velocity;
 	}
 };
 
-var canvateWorld;
-var cameraIcon;
+////////////////////////////////
+// TIRES
+renderTire = function(xyz, render, view){
+	var rx		= render.x;
+	var ry		= render.y;
+	var rz		= render.z;
+	var scale	= render.scale;
+	var visible	= render.visible;
+	
+	if (rz < 0){
+		xyz.z += 3000;
+	}
+};
 
-function init(){
-	canvateWorld = new CanvateWorld (totalColumns, totalRows, _size);
-	cameraIcon.setScale(0.1, 0.1);
-	//cameraIcon.setPivot(.56, .5);
-	//cameraIcon.setPosition(200, 75);
-	cameraIcon.startDrag();
-	cameraIcon.addEventListener("draging", onDraging);
+// CARS
+for (index=0; index<3; index++){
+	var car = world.addNewByURL("img/car.png");
+
+	var xyz = {};
+		xyz.x = 200 - Math.random()*400;
+		xyz.y = 0;
+		xyz.z = 500+Math.random()*1000;
+		xyz.velocity = 20 + index*5;
+
+	shinkansen.add(xyz, car, renderCar);
+}
+// TIRES
+for (index=0; index<20; index++){
+	var tire = world.addNewByURL("img/tire.jpg");
+
+	var xyz = {};
+	if (index < 10){
+		xyz.x = -250;
+		xyz.z = index*300;
+	}else{
+		xyz.x = 250;
+		xyz.z = 150 + (index-10)*300;
+	}
+
+	xyz.y = 0;
+
+	shinkansen.add(xyz, tire, renderTire);
 }
 
-setTimeout(init, 2000);
-*/
+///////////////////////////////
+// User Handler
+var isUp	= false;
+var isDown	= false;
+var isLeft	= false;
+var isRight	= false;
+
+function onDownDown (event){
+	isDown = true;
+}
+function onDownUp (event){
+	isDown = false;
+}
+
+function onUpDown(event){
+	isUp = true;
+}
+function onUpUp(event){
+	isUp = false;
+}
+
+function onLeftDown(event){
+	isLeft	= false;
+}
+function onLeftUp(event){
+	isLeft	= true;
+}
+
+function onRightDown(event){
+	var isRight	= true;
+}
+function onRightUp(event){
+	var isRight	= false;
+}
+
+var keyHandler = new KeyHandler(document);
+
+	keyHandler.onDown("down", onDownDown);
+	keyHandler.onUp("down", onDownUp);
+
+	keyHandler.onDown("up", onUpDown);
+	keyHandler.onUp("up", onUpUp);
+
+	keyHandler.onDown("left", onLeftDown);
+	keyHandler.onUp("left", onLeftUp);
+
+	keyHandler.onDown("right", onRightDown);
+	keyHandler.onUp("right", onRightUp);
+
+////////////////////////////////////////////////////
+// CAMERA HANDLER
+var velocity = 0;
+function checkKeys(){
+	if (isUp){
+		velocity += 2;
+	}else{
+		velocity *= .95;
+	}
+
+	if (isDown){
+		velocity -= 2;
+	}
+
+	if (velocity < 0) {
+		velocity = 0;
+	}else if (velocity > 80){
+		velocity = 80;
+	}
+
+	shinkansen.z += velocity;
+
+	if (isLeft){
+		shinkansen.x -= velocity/5;
+	}
+
+	if (isRight) {
+		shinkansen.x += velocity/5;
+	}
+
+	if (shinkansen.x < -200) {
+		shinkansen.x = -200;
+	}else if (shinkansen.x > 200) {
+		shinkansen.x = 200;
+	}
+};

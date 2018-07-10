@@ -1,5 +1,5 @@
-/* "VERSION 0.2.12"
-# Polishing
+/* "VERSION 0.2.11"
+# FIX addNewByURL and addNewById
 
 minified by https://javascript-minifier.com/
 */
@@ -46,9 +46,8 @@ window.Canvate = function(element) {
     var MOUSE_DOWN      = "mouseDown";
     var MOUSE_LEAVE     = "mouseLeave";
     var CLICK           = "click";
-    var DROP            = "drop";
     var DRAG            = "drag";
-    var DRAGING         = "draging";
+    var DROP            = "drop";
     var FUNCTION        = "function";
     var OBJECT          = "object";
     var CANVAS          = "canvas";
@@ -57,6 +56,7 @@ window.Canvate = function(element) {
     var IMG_PNG         = "image/png";
     var DESTINATION_IN  = "destination-in";
     var SOURCE_OVER     = "source-over";
+    var SOURCE_IN       = "source-in";
     var CANVATE         = "canvate";
     var PLAY            = "play";
     var PLAY_FROM       = "playFrom";
@@ -76,6 +76,7 @@ window.Canvate = function(element) {
     var hovering        = function(){};
     var _markToEmmit;
     var _mainCanvasOff;
+    var _mainContextOff;
     var _lastX;
     var _lastY;
     var _mouseX;
@@ -201,10 +202,12 @@ window.Canvate = function(element) {
     var calculateBounds = function(theta, xx, yy, pivotX,pivotY, wwidth,hheight){
         'use strict';
         
-        var minX;var minY;var maxX;var maxY;var cos;var sin;
-        var pxc;var pys;var pxs;var pyc;var pxw;var pyh;var pwc;var pws;
+        var pivotXX;var pivotYY;var minX;var minY;var maxX;var maxY;var cos;
+        var sin;var pxc;var pys;var pxs;var pyc;var pxw;var pyh;var pwc;var pws;
         var phs;var phc;var x1;var y1;var x2;var y2;var x3;var y3;var x4;var y4;
         
+        pivotXX = pivotX - xx;
+        pivotYY = pivotY - yy; 
         cos = Math.cos(theta);
         sin = Math.sin(theta);
         pxc = pivotX * cos;
@@ -277,8 +280,8 @@ window.Canvate = function(element) {
         var _textWidth;
         var _lineHeight;
         
-        var property;var value;var e1;var e2;
-        var edge;var maxWidth;var maxHeight;
+        var property;var value;var index;var line;var e1;var e2;
+        var edge; var remainder;var maxWidth;var maxHeight;
 
         this.getCanvas = function(){
             var isTheSame = true;
@@ -313,7 +316,7 @@ window.Canvate = function(element) {
                 var yText        = 0;
                 var lineWidth    = Math.ceil(_context.measureText(text).width);
                     _textWidth   = lineWidth;
-                var remainder    = "";
+                var reminder     = "";
                 var isLarger     = false;
                 var line;
                 while(lineWidth > maxWidth){
@@ -453,11 +456,13 @@ window.Canvate = function(element) {
         var _framesList    = [];
         var _initialWidth  = null;
         var _initialHeight = null;
+        var _isMask        = false;
         var _mask          = null;
         var _isDraging     = false;
         var _mouseX;
         var _mouseY;
         var _canvateMouse;
+        var _lineHeight;
         var _hasMouse;
         var _fromIndexFrame;
         var _endIndex;
@@ -471,12 +476,13 @@ window.Canvate = function(element) {
         
         // HELPERS VARIABLES
         var tileXsetCycle;var tileYsetCycle;var widthSetCycle;var heightSetCycle;
-        var indexSetCycle;var indexFrame;var fromIndexFrame;var untilIndexFrame;
+        var indexSetCycle;var gapX;var gapY;var tempCanvas;var tempContext;
+        var lastWidth;var indexFrame;var fromIndexFrame;var untilIndexFrame;
         var indexRender;var cropDataRender;var nowRender;var xRender;var yRender;
-        var widthRender;var heightRender;var cropXrender;var cropYrender;
+        var widthRender;var heightRender;var cropXrender;var cropYrender;var bounds;
         var cropWidthRender;var cropHeightRender;var pivotXrender;var pivotYrender;
         var alphaRender;var canvasRender;var canvateRender;var rotationRender;
-        var scaleXrender;var scaleYrender;
+        var scaleXrender;var scaleYrender; var data;
         
         // TRANSFORMATION METHODS
         this.setPosition = function(x, y){
@@ -613,7 +619,7 @@ window.Canvate = function(element) {
                 // Early return
                 return;
             }
-            _image         = image;
+            _image             = image;
             
             _initialWidth  = image.naturalWidth;
             _initialHeight = image.naturalHeight;
@@ -1429,6 +1435,11 @@ window.Canvate = function(element) {
                 cropWidthRender  = totalWidth;
                 cropHeightRender = totalHeight;
             }
+            /*
+                sakura.add(fuji)
+                sakura.setMask()
+                Draw the enmasked in the mask
+            */
             
             var canvas;var x;var y;var w;var h;
             
@@ -1470,6 +1481,7 @@ window.Canvate = function(element) {
                     _innerContext.globalCompositeOperation = DESTINATION_IN;
 
                     _innerContext.drawImage( canvasRender ,x ,y, w, h);
+                    console.log("V2")
                     alphaRender= _innerContext.getImageData(mouseX-minX, mouseY-minY, 1, 1).data[3];
                     if(alphaRender == 0){
                         _canvateMouse = null;
@@ -1491,9 +1503,7 @@ window.Canvate = function(element) {
                        };
             
             emit(_self.RENDER, {});
-            if(_isDraging){
-                emit(DRAGING, this);
-            }
+
             if(_isConvertion){
                 _isConvertion = false;
                 this.setImage(_image);
@@ -1570,6 +1580,7 @@ window.Canvate = function(element) {
             }
         }
         hovering();
+       // _context.drawImage(_mainCanvasOff, 0, 0);
         requestAnimationFrame(update);
     }
     
@@ -1598,7 +1609,7 @@ window.Canvate = function(element) {
             _mouseX  = event.clientX;
             _mouseY  = event.clientY;
             _lastX   = (_mouseX - _bounds.left) * (_mainCanvas.width/_bounds.width);
-            _lastY   = (_mouseY - _bounds.top)  * (_mainCanvas.width/_bounds.width);
+            _lastY   = (_mouseY - _bounds.top) * (_mainCanvas.width/_bounds.width);
             hovering = resolveOver;
         };
         
