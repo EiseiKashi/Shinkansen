@@ -1,9 +1,9 @@
 /*
-	Version 0.0.14
-	# Change alghoritm 4 Fix Offeset
+	Version 0.0.15
+	# Change alghoritm 5 Fix Offeset
 */
 
-var version = 14;
+var version = 15;
 document.title = version + " Shinkansen";
 
 // ::: EMITTER ::: //
