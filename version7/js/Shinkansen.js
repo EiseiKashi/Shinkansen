@@ -299,7 +299,7 @@ function Shinkansen (){
 			requestAnimationFrame(update);
 			_self.doRender.apply(_self);
 		}
-		requestAnimationFrame(update);
+		setTimeout(update, 10);
 	}
 
 	return new Shinkansen();
