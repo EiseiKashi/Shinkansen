@@ -1,6 +1,6 @@
 /*
 	Version 0.0.14
-	# Change alghoritm 4
+	# Change alghoritm 4 Fix Offeset
 */
 
 var version = 14;
@@ -202,19 +202,19 @@ function Shinkansen (){
 				}
 			}
 
-			if(_offsetX != _self._offsetX){
-				if(isNumber(_self._offsetX)){
-					_offsetX = _self._offsetX;
+			if(_offsetX != _self.offsetX){
+				if(isNumber(_self.offsetX)){
+					_offsetX = _self.offsetX;
 				}else{
-					_self._offsetX = _offsetX;
+					_self.offsetX = _offsetX;
 				}
 			}
 
-			if(_offsetY != _self._offsetY){
-				if(isNumber(_self._offsetY)){
-					_offsetY = _self._offsetY;
+			if(_offsetY != _self.offsetY){
+				if(isNumber(_self.offsetY)){
+					_offsetY = _self.offsetY;
 				}else{
-					_self._offsetY = _offsetY;
+					_self.offsetY = _offsetY;
 				}
 			}
 
