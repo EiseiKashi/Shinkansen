@@ -1,9 +1,9 @@
 /*
-	Version 0.0.13
-	# Change alghoritm 3
+	Version 0.0.14
+	# Change alghoritm 4
 */
 
-var version = 13;
+var version = 14;
 document.title = version + " Shinkansen";
 
 // ::: EMITTER ::: //
@@ -99,8 +99,10 @@ function Shinkansen (){
 		this.cameraZ;
 		this.focalLength;
 		this.rotation;
-		
+
 		var _self			= this;
+		this.offsetX		= 0;
+		this.offsetY		= 0;
 		var _cameraX		= 0;
 		var _cameraY		= 0;
 		var _cameraZ		= 0;
@@ -127,14 +129,14 @@ function Shinkansen (){
 				object2D = {};
 			}
 
-			object2D.x	= isNumber(object2D.x) ? object2D.x : 0;
-			object2D.y	= isNumber(object2D.y) ? object2D.y : 0;
-			object2D.z	= isNumber(object2D.z) ? object2D.z : 0;
+			object2D.x		= isNumber(object2D.x) ? object2D.x : 0;
+			object2D.y		= isNumber(object2D.y) ? object2D.y : 0;
+			object2D.z		= isNumber(object2D.z) ? object2D.z : 0;
 
-			object3D	= {}
-			object3D.x	= 0;
-			object3D.y	= 0;
-			object3D.z	= 0;
+			var object3D	= {}
+				object3D.x	= 0;
+				object3D.y	= 0;
+				object3D.z	= 0;
 			
 			var clip = new Clip3D(object2D, object3D, view, callback, context);
 			_clipList.push(clip);
@@ -224,7 +226,9 @@ function Shinkansen (){
 
 			_rotation	= ((_rotation%360)+360)%360;
 			var radian  = _rotation * (PI2/360);
-
+			
+			var object2D;
+			var object3D;
 			for(var index=0; index < length; index++){
 				clip			= _clipList[index];
 				object2D		= clip.object2D;

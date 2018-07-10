@@ -11,7 +11,16 @@ var shinkansen = new Shinkansen();
 	shinkansen.focalLength	= 300;
 
 ///////////////////////////////
+// CANVATE
+var canvas			= document.getElementById("world");
+	canvas.width	= 300;
+	canvas.height	= 300;
+
+var world = new Canvate(canvas);
+
+///////////////////////////////
 // CARS
+var carSize = 20;;
 renderCar = function(xyz, render, view){
 	var rx		= render.x;
 	var ry		= render.y;
@@ -26,6 +35,10 @@ renderCar = function(xyz, render, view){
 		}
 		xyz.z += xyz.velocity;
 	}
+
+	view.x = rx;
+	view.y = ry;
+	view.setScale(rz, rz);
 };
 
 ////////////////////////////////
@@ -40,6 +53,10 @@ renderTire = function(xyz, render, view){
 	if (rz < 0){
 		xyz.z += 3000;
 	}
+
+	view.x = rx;
+	view.y = ry;
+	view.setScale(rz, rz);
 };
 
 // CARS
@@ -157,3 +174,5 @@ function checkKeys(){
 		shinkansen.x = 200;
 	}
 };
+
+setInterval(checkKeys, 20);
