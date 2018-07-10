@@ -240,7 +240,7 @@ function Shinkansen (){
 				object3D.x 		= _offsetX + x * z;
 				object3D.y		= _offsetY + y * z;
 				object3D.z		= z;
-				object3D.visible= z < -_focalLength;
+				object3D.visible= z < _focalLength;
 			}
 			
 			_clipList.sort(sortList);

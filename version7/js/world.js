@@ -20,8 +20,11 @@ var world = new Canvate(canvas);
 
 ///////////////////////////////
 // CARS
-var carSize = 20;;
+var carSize = 20;
 renderCar = function(xyz, render, view){
+	
+	//view.visible = render.visible;
+	
 	var rx		= render.x;
 	var ry		= render.y;
 	var rz		= render.z;
@@ -44,6 +47,7 @@ renderCar = function(xyz, render, view){
 ////////////////////////////////
 // TIRES
 renderTire = function(xyz, render, view){
+	view.visible = render.visible;
 	var rx		= render.x;
 	var ry		= render.y;
 	var rz		= render.z;
@@ -111,17 +115,17 @@ function onUpUp(event){
 }
 
 function onLeftDown(event){
-	isLeft	= false;
+	isLeft	= true;
 }
 function onLeftUp(event){
-	isLeft	= true;
+	isLeft	= false;
 }
 
 function onRightDown(event){
-	var isRight	= true;
+	isRight	= true;
 }
 function onRightUp(event){
-	var isRight	= false;
+	isRight	= false;
 }
 
 var keyHandler = new KeyHandler(document);
@@ -158,20 +162,20 @@ function checkKeys(){
 		velocity = 80;
 	}
 
-	shinkansen.z += velocity;
+	shinkansen.cameraZ += velocity;
 
 	if (isLeft){
-		shinkansen.x -= velocity/5;
+		shinkansen.cameraX -= velocity/5;
 	}
 
 	if (isRight) {
-		shinkansen.x += velocity/5;
+		shinkansen.cameraX += velocity/5;
 	}
 
-	if (shinkansen.x < -200) {
-		shinkansen.x = -200;
-	}else if (shinkansen.x > 200) {
-		shinkansen.x = 200;
+	if (shinkansen.cameraX < -200) {
+		shinkansen.cameraX = -200;
+	}else if (shinkansen.cameraX > 200) {
+		shinkansen.cameraX = 200;
 	}
 };
 

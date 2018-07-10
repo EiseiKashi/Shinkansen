@@ -167,12 +167,12 @@ window.KeyHandler = function(target){
 	}
 
 	this.removeDown = function(key, listener, context){
-			var type = _userKeyList[key];
+		var type = _userKeyList[key];
 
-			if(null != type){
-				_emitter.removeEventListener(type+DOWN, listener, context);
-			}
+		if(null != type){
+			_emitter.removeEventListener(type+DOWN, listener, context);
 		}
+	}
 
 	this.removeUp = function(key, listener, context){
 		var type = _mapKeyList[key];

@@ -1581,7 +1581,7 @@ window.Canvate = function(element) {
         }
         hovering();
        // _context.drawImage(_mainCanvasOff, 0, 0);
-        requestAnimationFrame(update);
+        setTimeout(update, 10);
     }
     
      // ::: INITIALIZATION ::: //
@@ -1650,7 +1650,6 @@ window.Canvate = function(element) {
         };
         
         var _mainEmitter = new Emitter(_mainCanvas);
-        
         update();
     }
     
