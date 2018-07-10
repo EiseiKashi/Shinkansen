@@ -72,6 +72,24 @@ function Shinkansen (){
 	
 	var _orderCounter = 0;
 
+	var Node3d = function(view, width, height){
+		'use strict'
+		_self = this;
+
+		this.width 	= width;
+		this.height	= height;
+
+		this.render = function(x, y, z){
+			var style			= view.style; 
+				style.display	= visible ? "inline" : "none";
+				style.left   	= x + "px";
+				style.top    	= y + "px";
+				style.width  	= (z*_self.width)  + "px";
+				style.height 	= (z*_self.height) + "px";
+				style.zIndex 	= index;
+		}
+	}
+
 	var Clip3D = function (object2D, object3D, view, callback, context) {
 		'use strict';
 
@@ -157,6 +175,12 @@ function Shinkansen (){
 				}
 			}
 			emitEvent(Shinkansen.REMOVE, clip);
+		}
+
+		this.addNode = function(view, width, heigth, callback, context){
+			var node = new Node3d(view, width, heigth);
+			var clip = this.add({x:0, y:0, z:0}, view, callback, context);
+			return clip;
 		}
 
 		this.debuger = {};
@@ -299,7 +323,7 @@ function Shinkansen (){
 			requestAnimationFrame(update);
 			_self.doRender.apply(_self);
 		}
-		setTimeout(update, 10);
+		//requestAnimationFrame(update, 10);
 	}
 
 	return new Shinkansen();
