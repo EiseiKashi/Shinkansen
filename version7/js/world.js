@@ -18,7 +18,10 @@ var canvas			= document.getElementById("world");
 
 var world = new Canvate(canvas);
 
-	world.addEventListener("render", function(){shinkansen.doRender()});
+	world.addEventListener("render", function(){
+		checkKeys();
+		shinkansen.doRender.apply(shinkansen);
+	});
 
 ///////////////////////////////
 // CARS
@@ -181,5 +184,3 @@ function checkKeys(){
 		shinkansen.cameraX = 200;
 	}
 };
-
-setInterval(checkKeys, 20);

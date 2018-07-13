@@ -1,6 +1,6 @@
 /*
-	Version 0.0.15
-	# Change alghoritm 5 Fix Offeset
+	Version 0.0.16
+	# Change alghoritm 6 Fix Offeset
 */
 
 var version = 15;
@@ -318,12 +318,13 @@ function Shinkansen (){
 				return 1;
 			}
 		}
-
+		/*
 		var update = function(){
 			requestAnimationFrame(update);
 			_self.doRender.apply(_self);
 		}
-		//requestAnimationFrame(update, 10);
+		requestAnimationFrame(update, 10);
+		*/
 	}
 
 	return new Shinkansen();
