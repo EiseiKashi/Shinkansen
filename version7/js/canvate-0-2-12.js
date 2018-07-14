@@ -1,4 +1,4 @@
-/* "VERSION 0.2.11"
+/* "VERSION 0.2.12"
 # FIX addNewByURL and addNewById
 
 minified by https://javascript-minifier.com/
@@ -6,6 +6,23 @@ minified by https://javascript-minifier.com/
 window.Canvate = function(element) {
     'use strict';
     
+    window.isNumber = function(number){
+		var isNull   = null == number;
+		var isNotN   = isNaN(number);
+		var isString;
+		if(!isNull){
+			isString = number.length != undefined;
+		}
+		var isNotAnumber = isNull || isNotN  ||  isString;
+		if( isNotAnumber){
+			return false;
+		}
+		return true;
+    }
+    
+    window.isNotNumber = function(number){
+		return !isNumber(number);
+	}
     var isString = typeof element === "string";
     if(isString){
         element = document.getElementById(element);
@@ -255,15 +272,13 @@ window.Canvate = function(element) {
         var DEFAULT_BASE_LINE = "top";
         
         this.text             = text;
-        this.size             = null == size || 
-                                isNaN(size)          ? DEFAULT_SIZE  : size;
-        this.font             = null == font         ? DEFAULT_FONT      : font;
-        this.color            = null == color        ? DEFAULT_COLOR     : color;
-        this.width            = null == width  || isNaN(width)  ? null : width;
-        this.height           = null == height || isNaN(height) ? null : height;
-        this.interline        = null == interline || 
-                                isNaN(interline)     ? DEFAULT_INTERLINE : interline;
-        this.textAlign        = null == textAlign    ? DEFAULT_ALIGN     : textAlign; // center | left | right
+        this.size             = isNumber(size)      ? size          : DEFAULT_SIZE;
+        this.font             = null == font        ? DEFAULT_FONT  : font;
+        this.color            = null == color       ? DEFAULT_COLOR : color;
+        this.width            = isNumber(width)     ? width         : null;
+        this.height           = isNumber(height)    ? height        : null;
+        this.interline        = isNumber(interline) ? interline     : DEFAULT_INTERLINE;
+        this.textAlign        = null == textAlign   ? DEFAULT_ALIGN : textAlign; // center | left | right
         this.isWordWrap       = true;
         this.naturalWidth;
         this.naturalHeight;
@@ -393,6 +408,8 @@ window.Canvate = function(element) {
             return _textWidth;
         }
     }
+
+    var _canvateListById = {};
     
     // ::: CANVATE ::: //
     var Canvate = function (image){
@@ -452,7 +469,10 @@ window.Canvate = function(element) {
         var _emitter       = new Emitter(this);
         var _innerCanvas   = document.createElement(CANVAS);
         var _innerContext  = _innerCanvas.getContext(D2);
+
         var _canvateList   = [];
+            _canvateListById[_id] = _canvateList;
+
         var _framesList    = [];
         var _initialWidth  = null;
         var _initialHeight = null;
@@ -486,21 +506,18 @@ window.Canvate = function(element) {
         
         // TRANSFORMATION METHODS
         this.setPosition = function(x, y){
-            var isNum
-            isNum = !(x == null || isNaN(x));
-            if(isNum){
+            if(isNumber(x)){
                 this.x = x;
             }
             
-            isNum = !(y== null || isNaN(y));
-            if(isNum){
+            if(isNumber(y)){
                 this.y = y;
             }
         }
 
         this.setSize = function(width, height){
-            var isNotWidth  = (width  == null) || (isNaN(width)  && width  != AUTO);
-            var isNotHeight = (height == null) || (isNaN(height) && height != AUTO);
+            var isNotWidth  = isNotNumber(width)  && width  != AUTO;
+            var isNotHeight = isNotNumber(height) && height != AUTO;
             
             if(isNotWidth || isNotHeight || (width == AUTO && height==AUTO)){
                 return;
@@ -521,41 +538,35 @@ window.Canvate = function(element) {
         }
         
         this.setScale = function(x, y){
-            var isNum
-            isNum = !(x == null || isNaN(x));
-            if(isNum){
+            if(isNumber(x)){
                 this.scaleX = x;
             }
             
-            isNum = !(y== null || isNaN(y));
-            if(isNum){
+            if(isNumber(y)){
                 this.scaleY = y;
             }
         }
 
         this.setPivot = function(x, y){
-            var isNum
-            isNum = !(x == null || isNaN(x));
-            if(isNum){
+            if(isNumber(x)){
                 this.pivotX = x;
             }
             
-            isNum = !(y== null || isNaN(y));
-            if(isNum){
+            if(isNumber(y)){
                 this.pivotY = y;
             }
         }
         
         this.fitInto = function(maxWidth, maxHeight, offsetX, offsetY){
-            if(null == maxWidth || null == maxHeight || isNaN(maxWidth) || isNaN(maxHeight)){
+            if(isNotNumber(maxWidth) || isNotNumber(maxHeight)){
                 return;
             }
             
-            if(null == offsetX || isNaN(offsetX)){
+            if(isNotNumber(offsetX)){
                 offsetX = 0;
             }
             
-            if(null == offsetY || isNaN(offsetY)){
+            if(isNotNumber(offsetY)){
                 offsetY = 0;
             }
             this.render(0, 0);
@@ -598,12 +609,11 @@ window.Canvate = function(element) {
                 canvas.width  = width;
                 canvas.height = height;
            
-            finalWidth  = null == finalWidth  || isNaN(finalWidth)  ? width  : finalWidth;
-            finalHeight = null == finalHeight || isNaN(finalHeight) ? height : finalHeight; 
+            finalWidth  = isNumber(finalWidth)  ? finalWidth  : width;
+            finalHeight = isNumber(finalHeight) ? finalHeight : height; 
             
             var context = canvas.getContext(D2);
                 context.drawImage(_image, x, y, width, height, 0, 0, finalWidth, finalHeight);
-            
             
             var img             = document.createElement(IMG);
                 img.src         = canvas.toDataURL(IMG_PNG);
@@ -643,15 +653,15 @@ window.Canvate = function(element) {
         // CYCLE AND FRAME METHODS
         // Sets the Cycle animation
         this.setCycle = function(x, y, width, height, totalFrames, gapX, gapY){
-            tileXsetCycle  = _cropX      = null == x      || isNaN(x)      ? _cropX      : x;
-            tileYsetCycle  = _cropY      = null == y      || isNaN(y)      ? _cropY      : y;
-            widthSetCycle  = _cropWidth  = null == width  || isNaN(width)  ? _cropWidth  : width;
-            heightSetCycle = _cropHeight = null == height || isNaN(height) ? _cropHeight : height;
+            tileXsetCycle  = _cropX      = isNumber(x)      ? x      : _cropX;     
+            tileYsetCycle  = _cropY      = isNumber(y)      ? y      : _cropY; 
+            widthSetCycle  = _cropWidth  = isNumber(width)  ? width  : _cropWidth;
+            heightSetCycle = _cropHeight = isNumber(height) ? height : _cropHeight; 
             
-            gapX = null == gapX || isNaN(gapX) ? 0 : gapX;
-            gapY = null == gapY || isNaN(gapY) ? 0 : gapY;
+            gapX = isNumber(gapX) ? gapX : 0;
+            gapY = isNumber(gapY) ? gapY : 0;
             
-            if(null == totalFrames || isNaN(totalFrames)){
+            if(isNotNumber(totalFrames)){
                 var totalWidth  = Math.floor(_image.width/widthSetCycle);
                 var totalHeight = Math.floor(_image.height/heightSetCycle);
                 totalFrames     = _totalFrames = totalWidth * totalHeight;
@@ -746,7 +756,7 @@ window.Canvate = function(element) {
         
         //Sets the rect
         this.setRect = function(width, height, color){
-            if(null == width || null == height || isNaN(width) || isNaN(height)){
+            if(isNotNumber(width) || isNotNumber(height)){
                 return;
             }
             
@@ -880,7 +890,7 @@ window.Canvate = function(element) {
         
         // Add canvate at specific depth
         this.addAt = function(canvate, indexTarget){
-            if(null == canvate || canvate == this || isNaN(indexTarget)){
+            if(null == canvate || canvate == this || isNotNumber(indexTarget)){
                 return;
             }
             
@@ -910,7 +920,7 @@ window.Canvate = function(element) {
         
         // Remove Canvate at certaiin depth
         this.removeAt = function(indexTarget){
-            if(isNaN(indexTarget || indexTarget < 0 || !(indexTarget < _canvateList.length))){
+            if(isNotNumber(indexTarget || indexTarget < 0 || !(indexTarget < _canvateList.length))){
                 return;
             }
             var canvate = _canvateList.splice(indexTarget, 1)[0];
@@ -933,18 +943,27 @@ window.Canvate = function(element) {
         }
         
         // Set the depth of specific Canvate
-        this.setDepth = function(canvate, indexTarget){
-            if(null == canvate || canvate == this || isNaN(indexTarget)){
+        this.setDepth = function(indexTarget){
+            if(isNotNumber(indexTarget)){
+                throw new Error("The depth value must be a Number")
                 return;
             }
-            var indexTarget = Math.max(indexTarget, 0);
-            var length      = _canvateList.length;
-            var temp;
-            for(var index   = 0; index <length; index++){
-                temp     = _canvateList[index];
-                if(temp == canvate){
-                     _canvateList.splice(indexTarget, 0, _canvateList.splice(index, 1)[0]);
-                }
+            var parent      = this.getParent();
+            if(null == parent){
+                return;
+            }
+
+            var list        = _canvateListById[parent.getId()];
+            if(null == list){
+                return;
+            }
+
+            var length      = list.length;
+            var indexTarget = Math.round(Math.min(Math.max(indexTarget, 0), length-1));
+            var index       = list.indexOf(this);
+
+            if(index > -1){
+                list.splice(indexTarget, 0, list.splice(index, 1)[0]);
             }
         }
         
@@ -976,19 +995,22 @@ window.Canvate = function(element) {
         }
         
         // Bring a Canvate to front
-        this.toFront = function (canvate){
-            if(null == canvate){
+        this.toFront = function (){
+            var parent      = this.getParent();
+            if(null == parent){
                 return;
             }
-            this.setDepth(canvate, _canvateList.length-1);
+
+            var list        = _canvateListById[parent.getId()];
+            if(null == list){
+                return;
+            }
+            this.setDepth(list.length-1);
         }
         
         // Bring a Canvate to back
-        this.toBack = function (canvate){
-            if(null == canvate){
-                return;
-            }
-            this.setDepth(canvate, 0);
+        this.toBack = function (){
+            this.setDepth(0);
         }
         
         // Returns the parent
@@ -1002,7 +1024,7 @@ window.Canvate = function(element) {
         }
         
         var getIndexByFrame = function(frame){
-            if(isNaN(frame)){
+            if(isNotNumber(frame)){
                 throw new Error("The frame must be an integer and is: " + frame);
             }
             indexFrame = frame - 1;
@@ -1140,7 +1162,7 @@ window.Canvate = function(element) {
         }
         
         this.setFrameRate = function(frameRate){
-            if(null == frameRate || isNaN(frameRate)){
+            if(null == frameRate || isNotNumber(frameRate)){
                 //Early return
                 return;
             }
@@ -1335,8 +1357,8 @@ window.Canvate = function(element) {
             if(null != _image){
                 rx = widthRender  / _initialWidth;
                 ry = heightRender / _initialHeight;
-                rx = isNaN(rx) ? 1 : rx;
-                ry = isNaN(ry) ? 1 : ry;
+                rx = isNotNumber(rx) ? 1 : rx;
+                ry = isNotNumber(ry) ? 1 : ry;
             }else{
                 rx = 1;
                 ry = 1;

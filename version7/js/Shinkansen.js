@@ -1,6 +1,6 @@
 /*
-	Version 0.0.16
-	# Change alghoritm 6 Fix Offeset
+	Version 0.0.17
+	# Change alghoritm 17 Fix Offeset
 */
 
 var version = 15;
@@ -93,7 +93,7 @@ function Shinkansen (){
 	var Clip3D = function (object2D, object3D, view, callback, context) {
 		'use strict';
 
-		this.order		 = _orderCounter++;
+		var _order		 = ++_orderCounter;
 
 		this.object2D	 = object2D;
 		this.object3D	 = object3D;
@@ -107,6 +107,10 @@ function Shinkansen (){
 		this.view		 = view;
 		this.callback	 = callback;
 		this.context	 = context;
+
+		this.getOrder = function(){
+			return _order;
+		}
 	}
 
 	var Shinkansen = function() {
@@ -151,10 +155,11 @@ function Shinkansen (){
 			object2D.y		= isNumber(object2D.y) ? object2D.y : 0;
 			object2D.z		= isNumber(object2D.z) ? object2D.z : 0;
 
-			var object3D	= {}
-				object3D.x	= 0;
-				object3D.y	= 0;
-				object3D.z	= 0;
+			var object3D		= {}
+				object3D.x		= 0;
+				object3D.y		= 0;
+				object3D.z		= 0;
+				object3D.index	= _orderCounter;
 			
 			var clip = new Clip3D(object2D, object3D, view, callback, context);
 			_clipList.push(clip);
@@ -268,12 +273,11 @@ function Shinkansen (){
 			}
 			
 			_clipList.sort(sortList);
-
+			
 			for(var index=0; index < length; index++){
-				clip = _clipList[index];
-				clip.callback.call(clip.context, clip.object2D, clip.object3D, clip.view);
+				_clipList[index].object3D.index = index;
 			}
-
+			
 			emitEvent(RENDER);
 		}
 
@@ -300,31 +304,27 @@ function Shinkansen (){
 			b3d = clipB.object3D;
 			az  = a3d.z;
 			bz  = b3d.z;
+			
 			if(az == bz){
-				if(a3d.order < b3d.order){
-					return -1;
-				}
-				
-				if(a3d.order > b3d.order){
-					return 1;
-				};
+				az = a3d.getOrder();
+				bz = b3d.getOrder();
 			}
 
-			if(az < bz){
-				return -1;
-			}
-			
 			if(az > bz){
 				return 1;
 			}
+			
+			if(az < bz){
+				return -1;
+			}
 		}
-		/*
+		
 		var update = function(){
 			requestAnimationFrame(update);
 			_self.doRender.apply(_self);
 		}
 		requestAnimationFrame(update, 10);
-		*/
+		
 	}
 
 	return new Shinkansen();
