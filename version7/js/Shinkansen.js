@@ -1,6 +1,6 @@
 /*
-	Version 0.0.17
-	# Change alghoritm 17 Fix Offeset
+	Version 0.0.18
+	# Change alghoritm 18 Fix Offeset
 */
 
 var version = 15;

@@ -11,14 +11,19 @@ var shinkansen = new Shinkansen();
 	shinkansen.focalLength	= 300;
 
 ///////////////////////////////
-// CANVATE
-var canvas			= document.getElementById("world");
-	canvas.width	= 300;
-	canvas.height	= 300;
+// CONTAINER
+var container = document.createElement("section");
+	container.style.position = "relative";
+	container.style.width = "300px";
+	container.style.height = "300px";
+	container.style.overflow = "hidden";
 
-var world = new Canvate(canvas);
+document.body.appendChild(container);
 
-	world.addEventListener("render", function(){shinkansen.doRender()});
+///////////////////////////////
+// RENDER LIST
+var carList	 = [];
+var tireList = [];
 
 ///////////////////////////////
 // CARS
@@ -30,8 +35,8 @@ renderCar = function(xyz, render, view){
 	var rx		= render.x;
 	var ry		= render.y;
 	var rz		= render.z;
-	var scale	= render.scale;
 	var visible	= render.visible;
+	var index   = render.index;
 	
 	if (rz < 4000){
 		if (rz < 0){
@@ -40,12 +45,15 @@ renderCar = function(xyz, render, view){
 		}
 		xyz.z += xyz.velocity;
 	}
-
-	view.x = rx;
-	view.y = ry;
-	view.setScale(rz, rz);
+	var style			= view.style; 
+		style.display	= visible ? "inline" : "none";
+		style.left   	= rx + "px";
+		style.top    	= ry + "px";
+		style.width  	= (rz*99) + "px";
+		style.height 	= (rz*99) + "px";
+		style.zIndex 	= index;
 };
-
+/*
 ////////////////////////////////
 // TIRES
 renderTire = function(xyz, render, view){
@@ -53,35 +61,22 @@ renderTire = function(xyz, render, view){
 	var rx		= render.x;
 	var ry		= render.y;
 	var rz		= render.z;
-	var scale	= render.scale;
 	var visible	= render.visible;
 	
 	if (rz < 0){
 		xyz.z += 3000;
 	}
-
-	view.x = rx;
-	view.y = ry;
+	view.x		 = rx;
+	view.y		 = ry;
 	view.setScale(rz, rz);
+	view.setDepth(view, render.index);
+	view.visible = visible;
 };
 
-// CARS
-for (index=0; index<3; index++){
-	
-	var car = world.addNewByURL("img/car.png");
-
-	var xyz = {};
-		xyz.x = 200 - Math.random()*400;
-		xyz.y = 0;
-		xyz.z = 500+Math.random()*1000;
-		xyz.velocity = 20 + index*5;
-
-	shinkansen.add(xyz, car, renderCar);
-}
 // TIRES
 for (index=0; index<20; index++){
 	var tire = world.addNewByURL("img/tire.jpg");
-
+	
 	var xyz = {};
 	if (index < 10){
 		xyz.x = -250;
@@ -90,10 +85,36 @@ for (index=0; index<20; index++){
 		xyz.x = 250;
 		xyz.z = 150 + (index-10)*300;
 	}
-
+	
 	xyz.y = 0;
+	
+	var tire3D = shinkansen.add(xyz, tire);
+		tireList.push(tire3D);
+}
 
-	shinkansen.add(xyz, tire, renderTire);
+
+*/
+
+// CARS
+for (index=0; index<3; index++){
+	var img = document.createElement("img");
+		img.src = "img/fuji_go_ko.jpg";
+		img.style.width = "30px";
+		img.style.height = "30px";
+		img.style.display = "inline"
+		img.style.position = "absolute";
+		img.style.float = "left";
+	
+	container.appendChild(img);
+
+	var xyz = {};
+		xyz.x = 200 - Math.random()*400;
+		xyz.y = 0;
+		xyz.z = 500+Math.random()*1000;
+		xyz.velocity = 20 + index*5;
+
+	var car3D = shinkansen.add(xyz, img);
+		carList.push(car3D);
 }
 
 ///////////////////////////////
@@ -161,8 +182,8 @@ function checkKeys(){
 
 	if (velocity < 0) {
 		velocity = 0;
-	}else if (velocity > 80){
-		velocity = 80;
+	}else if (velocity > 20){
+		velocity = 30;
 	}
 
 	shinkansen.cameraZ += velocity;
@@ -182,4 +203,18 @@ function checkKeys(){
 	}
 };
 
-setInterval(checkKeys, 20);
+shinkansen.addEventListener("render", function(){
+	checkKeys();/*
+	var length = tireList.length;
+	var render;
+	for(var index=0; index < length; index++){
+		render = tireList[index];
+		renderTire(render.object2D, render.object3D, render.view);
+	}*/
+	var length = carList.length;
+	var render;
+	for(var index=0; index < length; index++){
+		render = carList[index];
+		renderCar(render.object2D, render.object3D, render.view);
+	}	
+});
