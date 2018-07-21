@@ -115,7 +115,7 @@ function Shinkansen (){
 
 	var Shinkansen = function() {
 		'use strict';
-		this.renderType = 0;
+		
 		this.cameraX;
 		this.cameraY;
 		this.cameraZ;
@@ -253,36 +253,30 @@ function Shinkansen (){
 				_self.rotation = _rotation;
 			}
 
-			_rotation			= ((_rotation%360)+360)%360;
-			var cameraRadian	= _rotation * (PI2/360);
-			
+			_rotation	= ((_rotation%360)+360)%360;
+			var radian  = _rotation * (PI2/360);
+			var radius;
+			var scale;
 			var object2D;
 			var object3D;
-
-			var radian;
-			var radius;
-			
 			for(var index=0; index < length; index++){
 				clip			= _clipList[index];
 				object2D		= clip.object2D;
 				object3D		= clip.object3D;
-
 				x				= (object2D.x - _cameraX);
-				y				= object2D.y;
-				z				= (object2D.z - _cameraZ);
-				radian			= Math.atan2(z,x)+cameraRadian;
-				radius 			= Math.sqrt(x*x + z*z);
-				x				= Math.cos(radian) * radius;
+				y				= (object2D.y - _cameraY);
+				radian			= Math.atan2(y, x) + radian;
+				radius			= Math.sqrt(x * x + y * y);
+				x				= Math.cos(radian) * radian;
 				z				= Math.sin(radian) * radius;
+				y				= object2D.y;
+
 				z 				= _focalLength/(_focalLength + z);
-				
 				object3D.x 		= _offsetX + x * z;
 				object3D.y		= _offsetY + y * z;
 				object3D.z		= z;
-				object3D.visible= z > 0;
+				object3D.visible= z < 0;
 			}
-			
-			
 			
 			_clipList.sort(sortList);
 			
