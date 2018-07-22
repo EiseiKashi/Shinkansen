@@ -1,10 +1,7 @@
 /*
-	Version 0.0.19
-	# Change alghoritm 19
+	Version 0.1.0
+	# Change alghoritm 0.1.0
 */
-
-var version = 15;
-document.title = version + " Shinkansen";
 
 // ::: EMITTER ::: //
 var MOUSE_OVER      = "mouseOver";
@@ -115,12 +112,12 @@ function Shinkansen (){
 
 	var Shinkansen = function() {
 		'use strict';
-		this.renderType = 0;
 		this.cameraX;
 		this.cameraY;
 		this.cameraZ;
 		this.focalLength;
 		this.rotation;
+		this.vertRotation;
 
 		var _self			= this;
 		this.offsetX		= 0;
@@ -130,6 +127,7 @@ function Shinkansen (){
 		var _cameraZ		= 0;
 		var _focalLength	= 300;
 		var _rotation		= 0;
+		var _vertRotation		= 0;
 		
 		var _emitter		= new Emitter(this);
 		
@@ -140,9 +138,6 @@ function Shinkansen (){
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 
-		var clip; var x; var y; var z; var radius; var angle;
-		var scale; var xyz; var visible;
-		
 		//----------------------------------------------
 		// INTERFACE
 		//----------------------------------------------
@@ -191,9 +186,13 @@ function Shinkansen (){
 		this.debuger = {};
 		this.onDebug = function(){
 		}
+		
+		var clip; var x; var y; var z; var tempX; var tempY; var tempZ;
+		var pane; var pitch; var object2D; var object3D; var length;
+		var radius; var radian; var cameraRadian;
 
-		this.doRender = function() {
-			var length = _clipList.length;
+		var doRender = function() {
+			length = _clipList.length;
 			if(0 == length){
 				// Early return
 				return;
@@ -248,41 +247,48 @@ function Shinkansen (){
 			}
 
 			if(isNumber(_self.rotation) && _self.rotation != _rotation){
-				_rotation = _self.rotation;
+				_self.rotation = _rotation = ((_self.rotation%360)+360)%360;
 			}else{
 				_self.rotation = _rotation;
 			}
 
-			_rotation			= ((_rotation%360)+360)%360;
-			var cameraRadian	= _rotation * (PI2/360);
-			
-			var object2D;
-			var object3D;
+			if(isNumber(_self.vertRotation) && _self.vertRotation != _vertRotation){
+				_self.vertRotation = _vertRotation = ((_self.vertRotation%360)+360)%360;
+			}else{
+				_self.vertRotation = _vertRotation;
+			}
 
-			var radian;
-			var radius;
-			
 			for(var index=0; index < length; index++){
 				clip			= _clipList[index];
 				object2D		= clip.object2D;
 				object3D		= clip.object3D;
-
-				x				= (object2D.x - _cameraX);
-				y				= object2D.y;
-				z				= (object2D.z - _cameraZ);
-				radian			= Math.atan2(z,x)+cameraRadian;
-				radius 			= Math.sqrt(x*x + z*z);
-				x				= Math.cos(radian) * radius;
-				z				= Math.sin(radian) * radius;
-				z 				= _focalLength/(_focalLength + z);
 				
+				x				= object2D.x - _cameraX;
+				y				= object2D.y - _cameraY;
+				z				= object2D.z - _cameraZ;
+				
+				pane		= _rotation * (PI2/360);
+				pitch		= _vertRotation * (PI2/360);
+				
+				// YAW
+				tempX	= Math.cos(pane)*x - Math.sin(pane)*z;
+				tempZ	= Math.sin(pane)*x + Math.cos(pane)*z;
+				x		= tempX;
+				z		= tempZ;
+
+				// PITCH
+				tempY	= Math.cos(pitch)*y - Math.sin(pitch)*z;
+				tempZ	= Math.sin(pitch)*y + Math.cos(pitch)*z;
+				y		= tempY;
+				z		= tempZ;
+				
+				z = _focalLength/(_focalLength + z);
+
 				object3D.x 		= _offsetX + x * z;
 				object3D.y		= _offsetY + y * z;
 				object3D.z		= z;
 				object3D.visible= z > 0;
 			}
-			
-			
 			
 			_clipList.sort(sortList);
 			
@@ -318,8 +324,8 @@ function Shinkansen (){
 			bz  = b3d.z;
 			
 			if(az == bz){
-				az = a3d.getOrder();
-				bz = b3d.getOrder();
+				az = clipA.getOrder();
+				bz = clipB.getOrder();
 			}
 
 			if(az > bz){
@@ -333,7 +339,7 @@ function Shinkansen (){
 		
 		var update = function(){
 			requestAnimationFrame(update);
-			_self.doRender.apply(_self);
+			doRender();
 		}
 		requestAnimationFrame(update, 10);
 		
