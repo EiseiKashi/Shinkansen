@@ -38,8 +38,8 @@ renderView = function(xyz, render, view){
 		style.display	= visible ? "inline" : "none";
 		style.left   	= rx + "px";
 		style.top    	= ry + "px";
-		style.width  	= (rz*99) + "px";
-		style.height 	= (rz*99) + "px";
+		style.width  	= (rz*120) + "px";
+		style.height 	= (rz*100) + "px";
 		style.zIndex 	= index;
 
 		style.position = "absolute";
@@ -48,12 +48,13 @@ renderView = function(xyz, render, view){
 
 var imageList = [
 					 "img/mimieze.jpg"
-					,"img/fuji_go_ko.jpg"
-					,"img/kyoto.jpg"
+					,"img/fuji.jpg"
 					,"img/mimieze1.jpg"
-					,"img/matsumoto.jpg"
+					,"img/kyoto.jpg"
+					,"img/himeji.jpg"
 					,"img/miyajima.jpg"
 					,"img/tokyo.jpg"
+					,"img/tohoku.jpg"
 				];
 
 var spin = Math.PI*2/imageList.length;
