@@ -3,19 +3,6 @@
 	# Change alghoritm 0.1.0
 */
 
-// ::: EMITTER ::: //
-var MOUSE_OVER      = "mouseOver";
-var MOUSE_OUT       = "mouseOut";
-var MOUSE_UP        = "mouseUp";
-var MOUSE_DOWN      = "mouseDown";
-var MOUSE_LEAVE     = "mouseLeave";
-var CLICK           = "click";
-var DROP            = "drop";
-var DRAG            = "drag";
-var DRAGING         = "draging";
-var FUNCTION        = "function";
-var OBJECT          = "object";
-
 function Shinkansen (){
 	'use strict'
 
@@ -73,9 +60,11 @@ function Shinkansen (){
 		'use strict'
 		_self = this;
 
+		//----------------------------------------------
+		// Public properties
+		//----------------------------------------------
 		this.width 	= width;
 		this.height	= height;
-
 		this.render = function(x, y, z){
 			var style			= view.style; 
 				style.display	= visible ? "inline" : "none";
@@ -87,60 +76,47 @@ function Shinkansen (){
 		}
 	}
 
-	var Clip3D = function (object2D, object3D, view, callback, context) {
+	var Clip3D = function (object2D, object3D, view) {
 		'use strict';
-
 		var _order		 = ++_orderCounter;
 
+		//----------------------------------------------
+		// Public properties
+		//----------------------------------------------
 		this.object2D	 = object2D;
 		this.object3D	 = object3D;
+		this.view		 = view;
+		this.getOrder = function(){
+			return _order;
+		}
 		
 		object3D.x 		 = 0;
 		object3D.y 		 = 0;
 		object3D.z 		 = 0;
 		object3D.scale	 = 1;
 		object3D.visible = true;
-		
-		this.view		 = view;
-		this.callback	 = callback;
-		this.context	 = context;
-
-		this.getOrder = function(){
-			return _order;
-		}
 	}
 
 	var Shinkansen = function() {
 		'use strict';
+		var _self = this;
+		
+		//----------------------------------------------
+		// Public properties
+		//----------------------------------------------
 		this.cameraX;
 		this.cameraY;
 		this.cameraZ;
 		this.focalLength;
 		this.rotation;
 		this.vertRotation;
-
-		var _self			= this;
-		this.offsetX		= 0;
-		this.offsetY		= 0;
-		var _cameraX		= 0;
-		var _cameraY		= 0;
-		var _cameraZ		= 0;
-		var _focalLength	= 300;
-		var _rotation		= 0;
-		var _vertRotation		= 0;
-		
-		var _emitter		= new Emitter(this);
-		
-		var PI2				= Math.PI * 2;
-		
-		var _clipList		= new Array();
-		
-		var _offsetX		= 0;
-		var _offsetY		= 0;
+		this.offsetX	= 0;
+		this.offsetY	= 0;
 
 		//----------------------------------------------
 		// INTERFACE
 		//----------------------------------------------
+
 		this.add = function(object2D, view, callback, context){
 			if(typeof object2D != 'object'){
 				object2D = {};
@@ -182,15 +158,39 @@ function Shinkansen (){
 			var clip = this.add({x:0, y:0, z:0}, view, callback, context);
 			return clip;
 		}
-
-		this.debuger = {};
-		this.onDebug = function(){
+		
+		this.addEventListener = function (type, listener, context){
+			_emitter.addEventListener(type, listener, context);
 		}
 		
+		this.removeEventListener = function (type, listener, context){
+			_emitter.removeEventListener(type, listener, context);
+		}
+
+		//----------------------------------------------
+		// Private properties
+		//----------------------------------------------
+		var _cameraX		= 0;
+		var _cameraY		= 0;
+		var _focalLength	= 300;
+		var _rotation		= 0;
+		var PI2				= Math.PI * 2;
+		var _cameraZ		= 0;
+		var _vertRotation	= 0;
+		var _offsetX		= 0;
+		var _offsetY		= 0;
+		var _emitter		= new Emitter(this);
+		var _clipList		= new Array();
+		
+		//----------------------------------------------
+		// Helpers properties
+		//----------------------------------------------
 		var clip; var x; var y; var z; var tempX; var tempY; var tempZ;
 		var pane; var pitch; var object2D; var object3D; var length;
-		var radius; var radian; var cameraRadian;
-
+		
+		//----------------------------------------------
+		// Helpers
+		//----------------------------------------------
 		var doRender = function() {
 			length = _clipList.length;
 			if(0 == length){
@@ -299,23 +299,10 @@ function Shinkansen (){
 			emitEvent(RENDER);
 		}
 
-		// Add listener
-        this.addEventListener = function (type, listener, context){
-            _emitter.addEventListener(type, listener, context);
-        }
-        
-        // Remove Listener
-        this.removeEventListener = function (type, listener, context){
-            _emitter.removeEventListener(type, listener, context);
-		}
-		
 		var emitEvent = function(type, data){
-            _emitter.emit(type, data);
+			_emitter.emit(type, data);
 		}
 
-		//----------------------------------------------
-		// Helpers
-		//----------------------------------------------
 		var sortList = function(clipA, clipB){
 			var az; var bz; var a3d; var b3d;
 			a3d = clipA.object3D;
@@ -341,8 +328,8 @@ function Shinkansen (){
 			requestAnimationFrame(update);
 			doRender();
 		}
+
 		requestAnimationFrame(update, 10);
-		
 	}
 
 	return new Shinkansen();

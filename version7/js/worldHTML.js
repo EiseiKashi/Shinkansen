@@ -22,13 +22,12 @@ document.body.appendChild(container);
 
 ///////////////////////////////
 // RENDER LIST
-var carList	 = [];
+var viewList	 = [];
 var tireList = [];
 
 ///////////////////////////////
-// CARS
-var carSize = 20;
-renderCar = function(xyz, render, view){
+// VIEW
+renderView = function(xyz, render, view){
 	var rx		= render.x;
 	var ry		= render.y;
 	var rz		= render.z;
@@ -42,22 +41,27 @@ renderCar = function(xyz, render, view){
 		style.width  	= (rz*99) + "px";
 		style.height 	= (rz*99) + "px";
 		style.zIndex 	= index;
+
+		style.position = "absolute";
+		style.float = "left";
 };
 
-var spin = Math.PI*2/5;
 var imageList = [
-					"img/fuji_go_ko.jpg"
+					 "img/mimieze.jpg"
+					,"img/fuji_go_ko.jpg"
 					,"img/kyoto.jpg"
+					,"img/mimieze1.jpg"
 					,"img/matsumoto.jpg"
 					,"img/miyajima.jpg"
 					,"img/tokyo.jpg"
 				];
 
+var spin = Math.PI*2/imageList.length;
+
 for (index=0; index < imageList.length; index++){
 	var img = document.createElement("img");
 		img.src = imageList[index];
-		img.style.position = "absolute";
-		img.style.float = "left";
+		
 	
 	container.appendChild(img);
 
@@ -66,8 +70,8 @@ for (index=0; index < imageList.length; index++){
 		xyz.y = -50;
 		xyz.z = Math.sin(spin*index)*200;
 
-	var car3D = shinkansen.add(xyz, img);
-		carList.push(car3D);
+	var view3D = shinkansen.add(xyz, img);
+		viewList.push(view3D);
 }
 
 ///////////////////////////////
@@ -135,17 +139,19 @@ function checkKeys(){
 	if (isRight) {
 	}
 };
-
-shinkansen.addEventListener("render", function(){
+var angularRotation = 0.5;
+var onRender = function(){
 	checkKeys();
-	var length = carList.length;
+	var length = viewList.length;
 	var render;
 	for(var index=0; index < length; index++){
-		render = carList[index];
-		renderCar(render.object2D, render.object3D, render.view);
+		render = viewList[index];
+		renderView(render.object2D, render.object3D, render.view);
 	}
-	shinkansen.rotation += 0.5;
-});
+	shinkansen.rotation += angularRotation;
+}
+
+shinkansen.addEventListener("render", onRender);
 
 var section = document.createElement("section");
 	section.style.color = "white";
