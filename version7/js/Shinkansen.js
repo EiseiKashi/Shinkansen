@@ -1,6 +1,6 @@
 /*
-	Version 0.1.0
-	# Change alghoritm 0.1.0
+	Version 0.2.0
+	# Roll rotation
 */
 
 function Shinkansen (){
@@ -12,10 +12,8 @@ function Shinkansen (){
         if(null == element){
             throw "There is no element with the 'id': " + element;
         }
-    }
-    
-    window.check = true;
-    var lastTime = 0;
+	}
+	
     var vendors  = ['ms', 'moz', 'webkit', 'o'];
     
     for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
@@ -25,11 +23,8 @@ function Shinkansen (){
     }
     
     if (!window.requestAnimationFrame){
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime   = Date.now();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id         = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
-            lastTime       = currTime + timeToCall;
+        window.requestAnimationFrame = function(callback) {
+            var id         = window.setTimeout(callback, 8);
             return id;
         };
     }
@@ -78,6 +73,7 @@ function Shinkansen (){
 
 	var Clip3D = function (object2D, object3D, view) {
 		'use strict';
+
 		var _order		 = ++_orderCounter;
 
 		//----------------------------------------------
@@ -86,6 +82,7 @@ function Shinkansen (){
 		this.object2D	 = object2D;
 		this.object3D	 = object3D;
 		this.view		 = view;
+		
 		this.getOrder = function(){
 			return _order;
 		}
@@ -117,7 +114,7 @@ function Shinkansen (){
 		// INTERFACE
 		//----------------------------------------------
 
-		this.add = function(object2D, view, callback, context){
+		this.add = function(object2D, view, data){
 			if(typeof object2D != 'object'){
 				object2D = {};
 			}
@@ -132,12 +129,12 @@ function Shinkansen (){
 				object3D.z		= 0;
 				object3D.index	= _orderCounter;
 			
-			var clip = new Clip3D(object2D, object3D, view, callback, context);
+			var clip = new Clip3D(object2D, object3D, view);
 			_clipList.push(clip);
 
 			emitEvent(Shinkansen.ADD, clip);
 
-			return {object2D:object2D, object3D:object3D, view:view};
+			return {object2D:object2D, object3D:object3D, view:view, data:data};
 		}
 
 		this.remove = function (clip) {
@@ -153,9 +150,14 @@ function Shinkansen (){
 			emitEvent(Shinkansen.REMOVE, clip);
 		}
 
-		this.addNode = function(view, width, heigth, callback, context){
+		this.getContainerStyle = function(){
+			var style = "position:relative;overflow:hidden";
+			return style;
+		}
+
+		this.addNode = function(view, width, heigth){
 			var node = new Node3d(view, width, heigth);
-			var clip = this.add({x:0, y:0, z:0}, view, callback, context);
+			var clip = this.add({x:0, y:0, z:0}, view);
 			return clip;
 		}
 		
@@ -170,13 +172,14 @@ function Shinkansen (){
 		//----------------------------------------------
 		// Private properties
 		//----------------------------------------------
+		var PI2				= Math.PI * 2;
 		var _cameraX		= 0;
 		var _cameraY		= 0;
+		var _cameraZ		= 0;
 		var _focalLength	= 300;
 		var _rotation		= 0;
-		var PI2				= Math.PI * 2;
-		var _cameraZ		= 0;
 		var _vertRotation	= 0;
+		var _rollRotation	= 0;
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 		var _emitter		= new Emitter(this);
@@ -186,7 +189,7 @@ function Shinkansen (){
 		// Helpers properties
 		//----------------------------------------------
 		var clip; var x; var y; var z; var tempX; var tempY; var tempZ;
-		var pane; var pitch; var object2D; var object3D; var length;
+		var pane; var pitch; var roll; var object2D; var object3D; var length;
 		
 		//----------------------------------------------
 		// Helpers
@@ -258,18 +261,25 @@ function Shinkansen (){
 				_self.vertRotation = _vertRotation;
 			}
 
+			if(isNumber(_self.rollRotation) && _self.rollRotation != _rollRotation){
+				_self.rollRotation = _rollRotation = ((_self.rollRotation%360)+360)%360;
+			}else{
+				_self.rollRotation = _rollRotation;
+			}
+
 			for(var index=0; index < length; index++){
-				clip			= _clipList[index];
-				object2D		= clip.object2D;
-				object3D		= clip.object3D;
+				clip		= _clipList[index];
+				object2D	= clip.object2D;
+				object3D	= clip.object3D;
 				
-				x				= object2D.x - _cameraX;
-				y				= object2D.y - _cameraY;
-				z				= object2D.z - _cameraZ;
+				x		= object2D.x - _cameraX;
+				y		= object2D.y - _cameraY;
+				z		= object2D.z - _cameraZ;
 				
-				pane		= _rotation * (PI2/360);
-				pitch		= _vertRotation * (PI2/360);
-				
+				pane	= _rotation 	* (PI2/360);
+				pitch	= _vertRotation * (PI2/360);
+				roll	= _rollRotation	* (PI2/360);
+
 				// YAW
 				tempX	= Math.cos(pane)*x - Math.sin(pane)*z;
 				tempZ	= Math.sin(pane)*x + Math.cos(pane)*z;
@@ -281,8 +291,16 @@ function Shinkansen (){
 				tempZ	= Math.sin(pitch)*y + Math.cos(pitch)*z;
 				y		= tempY;
 				z		= tempZ;
+
+				// ROLL
+				tempX	= Math.cos(_rollRotation)*x - Math.sin(_rollRotation)*y;
+				tempY	= Math.sin(_rollRotation)*x - Math.cos(_rollRotation)*y;
+				x		= tempX;
+				y		= tempY;
 				
-				z = _focalLength/(_focalLength + z);
+				var div = (_focalLength + z)
+					div = div == 0 ? 0.00000000000000000000000000000001 : div;
+				z = _focalLength/div;
 
 				object3D.x 		= _offsetX + x * z;
 				object3D.y		= _offsetY + y * z;
@@ -329,7 +347,7 @@ function Shinkansen (){
 			doRender();
 		}
 
-		requestAnimationFrame(update, 10);
+		update();
 	}
 
 	return new Shinkansen();
