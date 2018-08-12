@@ -1,7 +1,24 @@
+window.isNumber = function(number){
+	var isNull   = null == number;
+	var isNotN   = isNaN(number);
+	var isString;
+	if(!isNull){
+		isString = number.length != undefined;
+	}
+	var isNotAnumber = isNull || isNotN  ||  isString;
+	if( isNotAnumber){
+		return false;
+	}
+	return true;
+}
+
+window.isNotNumber = function(number){
+	return !isNumber(number);
+}
 ///////////////////////////////
 // CAMERA
 var shinkansen = new Shinkansen();
-	shinkansen.offsetX		= 450;
+	shinkansen.offsetX		= 250;
 	shinkansen.offsetY		= 50;
 
 	shinkansen.cameraX		= 0;
@@ -12,11 +29,13 @@ var shinkansen = new Shinkansen();
 
 ///////////////////////////////
 // CONTAINER
-var container = document.createElement("section");
-	container.style.position = "relative";
-	container.style.width = "900px";
-	container.style.height = "300px";
-	container.style.overflow = "hidden";
+var container = document.getElementById("world");
+	container.style.position	= "relative";
+	container.style.width		= "1200px";
+	container.style.height		= "1200px";
+	container.style.overflow	= "hidden";
+	container.style.borderRight	= "solid 1px grey";
+	container.style.borderLeft	= "solid 1px grey";
 
 document.body.appendChild(container);
 
@@ -47,14 +66,13 @@ renderView = function(xyz, render, view){
 };
 
 var imageList = [
-					 "img/mimieze.jpg"
-					,"img/fuji.jpg"
-					,"img/mimieze1.jpg"
-					,"img/kyoto.jpg"
-					,"img/himeji.jpg"
-					,"img/miyajima.jpg"
-					,"img/tokyo.jpg"
-					,"img/tohoku.jpg"
+					 "img/alice.png"
+					,"img/arcana.png"
+					,"img/aurora.png"
+					,"img/fiona.png"
+					,"img/jade.png"
+					,"img/lenore.png"
+					,"img/sophia.png"
 				];
 
 var spin = Math.PI*2/imageList.length;
@@ -75,74 +93,12 @@ for (index=0; index < imageList.length; index++){
 		viewList.push(view3D);
 }
 
-///////////////////////////////
-// User Handler
-var isUp	= false;
-var isDown	= false;
-var isLeft	= false;
-var isRight	= false;
-
-function onDownDown (event){
-	isDown = true;
-}
-function onDownUp (event){
-	isDown = false;
-}
-
-function onUpDown(event){
-	isUp = true;
-}
-function onUpUp(event){
-	isUp = false;
-}
-
-function onLeftDown(event){
-	isLeft	= true;
-}
-function onLeftUp(event){
-	isLeft	= false;
-}
-
-function onRightDown(event){
-	isRight	= true;
-}
-function onRightUp(event){
-	isRight	= false;
-}
-
-var keyHandler = new KeyHandler(document);
-
-	keyHandler.onDown("down", onDownDown);
-	keyHandler.onUp("down", onDownUp);
-
-	keyHandler.onDown("up", onUpDown);
-	keyHandler.onUp("up", onUpUp);
-
-	keyHandler.onDown("left", onLeftDown);
-	keyHandler.onUp("left", onLeftUp);
-
-	keyHandler.onDown("right", onRightDown);
-	keyHandler.onUp("right", onRightUp);
-
 ////////////////////////////////////////////////////
 // CAMERA HANDLER
 var velocity = 30;
-function checkKeys(){
-	if (isUp){
-	}
 
-	if (isDown){
-	}
-
-	if (isLeft){
-	}
-	
-	if (isRight) {
-	}
-};
 var angularRotation = 0.5;
 var onRender = function(){
-	checkKeys();
 	var length = viewList.length;
 	var render;
 	for(var index=0; index < length; index++){
@@ -150,17 +106,25 @@ var onRender = function(){
 		renderView(render.object2D, render.object3D, render.view);
 	}
 	shinkansen.rotation += angularRotation;
+
 }
+
+var onCameraXComplete = function(){
+	var focalLength = Math.random()*500 + 50;
+	var cameraX = Math.random() * 500;
+	cameraState.focalLength = focalLength;
+	cameraState.cameraX = cameraX;
+
+	cameraAnimator.play(3, 3);
+}
+cameraState    	= {
+					 cameraX:100
+					,focalLength:350
+				}
 
 shinkansen.addEventListener("render", onRender);
 
-var section = document.createElement("section");
-	section.style.color = "white";
-	var x = document.createElement("h3");
-	var y = document.createElement("h3");
-document.body.appendChild(section);
-section.appendChild(x);
-section.appendChild(y);
-
-this.onmousemove = function(event){
-}
+cameraAnimator	= new Yasashiku();
+cameraAnimator.add(shinkansen, cameraState);
+cameraAnimator.addEventListener("complete", onCameraXComplete);
+cameraAnimator.play(3, 3);

@@ -1,5 +1,5 @@
-/* "VERSION 0.2.12"
-# FIX addNewByURL and addNewById
+/* "VERSION 0.2.14"
+# FIX text wrap
 
 minified by https://javascript-minifier.com/
 */
@@ -68,7 +68,6 @@ window.Canvate = function(element) {
     var IMG_PNG         = "image/png";
     var DESTINATION_IN  = "destination-in";
     var SOURCE_OVER     = "source-over";
-    var SOURCE_IN       = "source-in";
     var CANVATE         = "canvate";
     var PLAY            = "play";
     var PLAY_FROM       = "playFrom";
@@ -86,7 +85,6 @@ window.Canvate = function(element) {
     var _mainCanvas     = element;
     var _context        = _mainCanvas.getContext(D2);
     var hovering        = function(){};
-    var _date           = new Date();
     var _markToEmmit;
     var _mainCanvasOff;
     var _mainContextOff;
@@ -651,7 +649,7 @@ window.Canvate = function(element) {
         
         // CYCLE AND FRAME METHODS
         // Sets the Cycle animation
-        this.setCycle = function(x, y, width, height, totalFrames, gapX, gapY){
+        this.setCycle = function(x, y, width, height, gapX, gapY, totalFrames){
             tileXsetCycle  = _cropX      = isNumber(x)      ? x      : _cropX;     
             tileYsetCycle  = _cropY      = isNumber(y)      ? y      : _cropY; 
             widthSetCycle  = _cropWidth  = isNumber(width)  ? width  : _cropWidth;
@@ -693,7 +691,7 @@ window.Canvate = function(element) {
             }
             
             if(1 < _totalFrames){
-                this.setSize(widthSetCycle, AUTO);
+                this.setSize(widthSetCycle, heightSetCycle);
             }
         }
         

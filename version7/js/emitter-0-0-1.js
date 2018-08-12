@@ -123,109 +123,127 @@ window.Emitter = function(target){
 	}
 }
 
-// ::: KEY HANDLER ::: //
-window.KeyHandler = function(target){
-	'use strict'
-
-	var _self	     = this;
-	var DOWN		 = "Down";
-	var UP  		 = "Up";
-	var ENIE         = "enie";
-
-	var _userKeyList = {
-						 up		: "ArrowUp"
-						,down	: "ArrowDown"
-						,left	: "ArrowLeft"
-						,right	: "ArrowRight"
-						,space	: "Space"
-						,tab	: "Tab"
-						,shift	:"ShiftLeft" // ShiftRight
-						,alt	:"AltLeft" // AltRight
-						,enter	:"Enter"
-					}
+Emitter.getKeyHandler = function(target){
+	var KeyHandler = function(target){
+		'use strict'
 	
-	var _mapKeyList	= {};
+		var _self	     = this;
+		var DOWN		 = "Down";
+		var UP  		 = "Up";
+		var ENIE         = "enie";
 	
-	var _emitter;
-	
-	this.onDown = function(key, listener, context){
-		key      = key.toLowerCase();
-		var type = _userKeyList[key];
-
-		if(null != type){
-			_emitter.addEventListener(key+DOWN, listener, context);
-		}
-	}
-
-	this.onUp = function(key, listener, context){
-		key      = key.toLowerCase();
-		var type = _userKeyList[key];
-
-		if(null != type){
-			_emitter.addEventListener(key+UP, listener, context);
-		}
-	}
-
-	this.removeDown = function(key, listener, context){
-		var type = _userKeyList[key];
-
-		if(null != type){
-			_emitter.removeEventListener(type+DOWN, listener, context);
-		}
-	}
-
-	this.removeUp = function(key, listener, context){
-		var type = _mapKeyList[key];
-
-		if(null != type){
-			_emitter.renoveEventListener(type+UP, listener, context);
-		}
-	}
-
-	var onkeydown = function(event){
-		emit(event.code, DOWN);
-	}
-
-	var onkeyup = function(event){
-		emit(event.code, UP);
-	}
-
-	var emit = function(code, sufix){
-		var key = _mapKeyList[code];
-			key = key == "enie" ? "ñ" : key;
-		if(null != key){
-			_emitter.emit(key+sufix, key);
-		}
-	}
-
-	var init = function(){
-		var letterList = "Q,W,E,R,T,Y,U,I,O,P,A,S,D,F,G,H,J,K,L,Z,X,C,V,B,N,M".split(",");
-		var length = letterList.length;
-		var letter;
-		for(var index=0; index < length; index++){
-			letter = letterList[index];
-			_userKeyList[letter.toLowerCase()] = "Key"+letter;
-
-			if(index < 10){
-				_userKeyList[index] = "Digit"+index;
+		var _userKeyList = {
+							 up		: "ArrowUp"
+							,down	: "ArrowDown"
+							,left	: "ArrowLeft"
+							,right	: "ArrowRight"
+							,space	: "Space"
+							,tab	: "Tab"
+							,shift	:"ShiftLeft" // ShiftRight
+							,alt	:"AltLeft" // AltRight
+							,enter	:"Enter"
+						}
+		
+		var _mapKeyList	= {};
+		var _downKeyList = [];
+		
+		var _emitter;
+		
+		this.onDown = function(key, listener, context){
+			key      = key.toLowerCase();
+			var type = _userKeyList[key];
+			if(null != type){
+				_emitter.addEventListener(key+DOWN, listener, context);
 			}
 		}
-
-		_userKeyList["enie"] = "Semicolon";
-		var value;
-		for(var userKey in _userKeyList){
-			value = _userKeyList[userKey];
-			_mapKeyList[value] = userKey;
+	
+		this.onUp = function(key, listener, context){
+			key      = key.toLowerCase();
+			var type = _userKeyList[key];
+	
+			if(null != type){
+				_emitter.addEventListener(key+UP, listener, context);
+			}
 		}
-
-		_userKeyList.ShiftRight	= "shift";
-		_userKeyList.AltRight	= "alt";
-		
-		_emitter = new Emitter(this);
-
-		target.addEventListener("keydown", onkeydown);
-		target.addEventListener("keyup", onkeyup);
+	
+		this.removeDown = function(key, listener, context){
+			var type = _userKeyList[key];
+	
+			if(null != type){
+				_emitter.removeEventListener(type+DOWN, listener, context);
+			}
+		}
+	
+		this.removeUp = function(key, listener, context){
+			var type = _mapKeyList[key];
+	
+			if(null != type){
+				_emitter.renoveEventListener(type+UP, listener, context);
+			}
+		}
+	
+		this.isDown = function(key){
+			return _downKeyList.indexOf(key) > -1;
+		}
+	
+		var onkeydown = function(event){
+			emit(event.code, DOWN);
+		}
+	
+		var onkeyup = function(event){
+			emit(event.code, UP);
+		}
+	
+		var emit = function(code, sufix){
+			var key = _mapKeyList[code];
+			if(null != key){
+				key = key.toLowerCase() == "semicolon" ? "ñ" : key;
+				var index = _downKeyList.indexOf(key);
+	
+				if(DOWN == sufix){
+					if(index == -1){
+						_downKeyList.push(key);
+					}
+				}else{
+					if(index > -1){
+						_downKeyList.splice(key, 1);
+					}
+				}
+				_emitter.emit(key+sufix, key);
+			}
+		}
+	
+		var init = function(){
+			var letterList = "Q,W,E,R,T,Y,U,I,O,P,A,S,D,F,G,H,J,K,L,Z,X,C,V,B,N,M".split(",");
+			var length = letterList.length;
+			var letter;
+			for(var index=0; index < length; index++){
+				letter = letterList[index];
+				_userKeyList[letter.toLowerCase()] = "Key"+letter;
+	
+				if(index < 10){
+					_userKeyList[index] = "Digit"+index;
+				}
+			}
+	
+			_userKeyList["semicolon"] = "Semicolon";
+			var value;
+			for(var userKey in _userKeyList){
+				value = _userKeyList[userKey];
+				_mapKeyList[value] = userKey;
+			}
+	
+			_userKeyList.ShiftRight	= "shift";
+			_userKeyList.AltRight	= "alt";
+			
+			_emitter = new Emitter(this);
+	
+			target.addEventListener("keydown", onkeydown);
+			target.addEventListener("keyup", onkeyup);
+		}
+	
+		init();
 	}
 
-	init();
+	return new KeyHandler(target);
 }

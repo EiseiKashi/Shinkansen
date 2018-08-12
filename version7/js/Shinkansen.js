@@ -1,6 +1,6 @@
 /*
-	Version 0.2.0
-	# Roll rotation
+	Version 0.1.0
+	# Change alghoritm 0.1.0
 */
 
 function Shinkansen (){
@@ -150,11 +150,6 @@ function Shinkansen (){
 			emitEvent(Shinkansen.REMOVE, clip);
 		}
 
-		this.getContainerStyle = function(){
-			var style = "position:relative;overflow:hidden";
-			return style;
-		}
-
 		this.addNode = function(view, width, heigth){
 			var node = new Node3d(view, width, heigth);
 			var clip = this.add({x:0, y:0, z:0}, view);
@@ -172,14 +167,13 @@ function Shinkansen (){
 		//----------------------------------------------
 		// Private properties
 		//----------------------------------------------
-		var PI2				= Math.PI * 2;
 		var _cameraX		= 0;
 		var _cameraY		= 0;
-		var _cameraZ		= 0;
 		var _focalLength	= 300;
 		var _rotation		= 0;
+		var PI2				= Math.PI * 2;
+		var _cameraZ		= 0;
 		var _vertRotation	= 0;
-		var _rollRotation	= 0;
 		var _offsetX		= 0;
 		var _offsetY		= 0;
 		var _emitter		= new Emitter(this);
@@ -189,7 +183,7 @@ function Shinkansen (){
 		// Helpers properties
 		//----------------------------------------------
 		var clip; var x; var y; var z; var tempX; var tempY; var tempZ;
-		var pane; var pitch; var roll; var object2D; var object3D; var length;
+		var pane; var pitch; var object2D; var object3D; var length;
 		
 		//----------------------------------------------
 		// Helpers
@@ -261,25 +255,18 @@ function Shinkansen (){
 				_self.vertRotation = _vertRotation;
 			}
 
-			if(isNumber(_self.rollRotation) && _self.rollRotation != _rollRotation){
-				_self.rollRotation = _rollRotation = ((_self.rollRotation%360)+360)%360;
-			}else{
-				_self.rollRotation = _rollRotation;
-			}
-
 			for(var index=0; index < length; index++){
-				clip		= _clipList[index];
-				object2D	= clip.object2D;
-				object3D	= clip.object3D;
+				clip			= _clipList[index];
+				object2D		= clip.object2D;
+				object3D		= clip.object3D;
 				
-				x		= object2D.x - _cameraX;
-				y		= object2D.y - _cameraY;
-				z		= object2D.z - _cameraZ;
+				x				= object2D.x - _cameraX;
+				y				= object2D.y - _cameraY;
+				z				= object2D.z - _cameraZ;
 				
-				pane	= _rotation 	* (PI2/360);
-				pitch	= _vertRotation * (PI2/360);
-				roll	= _rollRotation	* (PI2/360);
-
+				pane		= _rotation * (PI2/360);
+				pitch		= _vertRotation * (PI2/360);
+				
 				// YAW
 				tempX	= Math.cos(pane)*x - Math.sin(pane)*z;
 				tempZ	= Math.sin(pane)*x + Math.cos(pane)*z;
@@ -291,12 +278,6 @@ function Shinkansen (){
 				tempZ	= Math.sin(pitch)*y + Math.cos(pitch)*z;
 				y		= tempY;
 				z		= tempZ;
-
-				// ROLL
-				tempX	= Math.cos(_rollRotation)*x - Math.sin(_rollRotation)*y;
-				tempY	= Math.sin(_rollRotation)*x - Math.cos(_rollRotation)*y;
-				x		= tempX;
-				y		= tempY;
 				
 				var div = (_focalLength + z)
 					div = div == 0 ? 0.00000000000000000000000000000001 : div;
