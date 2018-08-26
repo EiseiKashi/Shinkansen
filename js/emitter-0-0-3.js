@@ -1,4 +1,3 @@
-
 window.MOUSE_OVER   = "mouseOver";
 window.MOUSE_OUT    = "mouseOut";
 window.MOUSE_UP     = "mouseUp";
@@ -64,8 +63,8 @@ window.Emitter = function(target){
 		return _hasMouse;
 	}
 	
-	this.removeEventListener = function(type, listener, context){
-		if(null == type || type == "" || typeof listener !== FUNCTION ){
+	this.removeEventListener = function(type, listenerToRemove, context){
+		if(null == type || type == "" || typeof listenerToRemove !== FUNCTION ){
 			return;
 		}
 		
@@ -77,7 +76,8 @@ window.Emitter = function(target){
 		var length = _listenerList.length;
 		for(var index=0; index < length; index++){
 			listener = _listenerList[index];
-			if(listener[LISTENER] == listener && 
+			
+			if(listener[LISTENER] == listenerToRemove && 
 			   listener[CONTEXT]  == context){
 				_listenerTypes[type].splice(index, 1);
 				switch(type){
@@ -104,8 +104,8 @@ window.Emitter = function(target){
 		if(null == type || type == ""){
 			return;
 		}
-		_listenerList = _listenerTypes[type];
-		if(null == _listenerList){
+		var _listenerList = _listenerTypes[type];
+		if(undefined === _listenerList){
 			return
 		}
 		data        = null == data || typeof data != OBJECT ? {} : data;
