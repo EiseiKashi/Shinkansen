@@ -178,14 +178,14 @@ function Yasashiku (){
 
     function Yasashiku(){
         'use strict'
-        this.EVENT_START    = "start";
-        this.EVENT_COMPLETE = "complete";
-        this.EVENT_TICK     = "tick";
-        this.EVENT_STOP     = "stop";
-        this.EVENT_PAUSE    = "pause";
+        Yasashiku.EVENT_START       = this.EVENT_START      = "start";
+        Yasashiku.EVENT_COMPLETE    = this.EVENT_COMPLETE   = "complete";
+        Yasashiku.EVENT_TICK        = this.EVENT_TICK       = "tick";
+        Yasashiku.EVENT_STOP        = this.EVENT_STOP       = "stop";
+        Yasashiku.EVENT_PAUSE       = this.EVENT_PAUSE      = "pause";
 
         var _self           = this;
-        var _emitter        = new Emitter(this);
+        var _emitter        = new Shika(this);
         var _stateList      = [];
         var _lastTime       = 0;
         var _lapsed         = 0;
